@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f0f13">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Parqour">
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> <!-- prevent iOS zoom with font-size 16px too -->
+<title>Parqour Hub</title>
+<link rel="stylesheet" href="style.css?v=2">
+<script src="i18n.js"></script>
+<link rel="apple-touch-icon" href="icon-180.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+<link rel="apple-touch-startup-image" href="splash-2048x2732.png" media="(orientation: portrait)">
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <img src="parqour.png" alt="Parqour">
+    <div class="lang">
+      <button id="btnEN" onclick="__setLang('en')">EN</button>
+      <button id="btnRU" onclick="__setLang('ru')">RU</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <a class="tile" href="counter.html">➕ Counter</a>
+    <a class="tile" href="report.html">🧾 Report (Отчёт)</a>
+  </div>
+
+  <div class="footer" id="footnote"></div>
+</div>
+
+<script>
+const t={
+  en:{counter:'➕ Counter', report:'🧾 Report', note:'All data is saved locally in your browser (persists after closing).'},
+  ru:{counter:'➕ Счётчик', report:'🧾 Отчёт', note:'Все данные сохраняются локально в вашем браузере (сохраняются после закрытия).'}
+};
+function apply(){
+  const l=window.__lang||'en';
+  document.querySelectorAll('a.tile')[0].textContent=t[l].counter;
+  document.querySelectorAll('a.tile')[1].textContent=t[l].report;
+  document.getElementById('footnote').textContent=t[l].note;
+  document.getElementById(l==='en'?'btnEN':'btnRU').classList.add('active');
+}
+apply();
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f0f13">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Parqour">
+
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport"/>
+<title>Parqour — Report</title>
+<link href="style.css?v=2" rel="stylesheet"/>
+<script src="i18n.js"></script>
+<script defer="" src="numeric.js"></script>
+<link href="icon-180.png" rel="apple-touch-icon">
+<link href="icon-192.png" rel="icon" sizes="192x192" type="image/png"/>
+</link><link rel="apple-touch-startup-image" href="splash-2048x2732.png" media="(orientation: portrait)">
+</head>
+<body>
+<div class="container">
+<div class="header">
+<a aria-label="Home" class="home" href="index.html">
+<svg viewbox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3z"></path></svg>
+</a>
+<img alt="Parqour" src="parqour.png"/>
+</div>
+<input id="startDT" type="hidden"/><input id="endDT" type="hidden"/>
+<div class="card reportcard"><button aria-label="Update now" class="updatefab" id="updateNow" title="Update now"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="img"><path d="M12 6V3L8 7l4 4V8c2.76 0 5 2.24 5 5 0 1.05-.32 2.02-.86 2.83l1.46 1.46C18.54 16.08 19 14.59 19 13c0-3.87-3.13-7-7-7zm-5 3.17C5.46 7.92 5 9.41 5 11c0 3.87 3.13 7 7 7v3l4-4-4-4v3c-2.76 0-5-2.24-5-5 0-1.05.32-2.02.86-2.83L6.4 9.17z"/></svg></button><button aria-label="Copy report" class="copyfab" id="copy"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" role="img"><path d="M15 3H7a2 2 0 0 0-2 2v10h2V5h8V3z"/><path d="M19 7H11a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zm0 12H11V9h8v10z"/></svg></button>
+<div class="cols">
+<h4 class="colhead" id="bHead">Babek</h4>
+<h4 class="colhead" id="lHead">Bailova</h4>
+<div class="block">
+<div class="field"><label id="lb1">Cars during period</label><input id="bb_period" min="0" placeholder="" type="number"/></div>
+<div class="field"><label id="lb2">On parking</label><input id="bb_onparking" min="0" placeholder="" type="number"/></div>
+<div class="field"><label id="lb3">Manual openings</label><input id="bb_manual" min="0" placeholder="" type="number"/></div>
+<div class="field"><label id="lb4">Not found</label><input id="bb_notfound" min="0" placeholder="" type="number"/></div>
+<div class="field"><label id="lb5">Close free sessions</label><input id="bb_close_free" min="0" placeholder="" type="number"/></div>
+<div class="field"><label id="lb6">Close paid sessions</label><input id="bb_close_paid" min="0" placeholder="" type="number"/></div>
+</div>
+<div class="block">
+<div class="field"><label id="ll1">Cars during period</label><input id="bl_period" min="0" placeholder="" type="number"/></div>
+<div class="field"><label id="ll2">On parking</label><input id="bl_onparking" min="0" placeholder="" type="number"/></div>
+<div class="field"><label id="ll3">Manual openings</label><input id="bl_manual" min="0" placeholder="" type="number"/></div>
+<div class="field"><label id="ll4">Not found</label><input id="bl_notfound" min="0" placeholder="" type="number"/></div>
+<div class="field"><label id="ll5">Close free sessions</label><input id="bl_close_free" min="0" placeholder="" type="number"/></div>
+<div class="field"><label id="ll6">Close paid sessions</label><input id="bl_close_paid" min="0" placeholder="" type="number"/></div>
+</div>
+<div class="block" style="grid-column:1 / -1;margin-top:10px">
+<h4 id="ticketsH" style="margin:0 0 8px 0">Tickets</h4>
+<div class="field"><label id="ticketsL">Count</label><input id="tickets" min="0" placeholder="" type="number"/></div>
+</div>
+</div>
+</div>
+<div class="card copywrap" style="margin-top:12px">
+
+<textarea class="ta" id="out" placeholder="Text will appear here…"></textarea>
+</div>
+</div>
+<div class="toast" id="toast">Copied!</div>
+<script>
+const t={
+  en:{babek:'Babek',bail:'Bailova',cars:'Cars during period',park:'On parking',manual:'Manual openings',nf:'Not found',cf:'Close free sessions',cp:'Close paid sessions',tickets:'Tickets',count:'Count',copy:'Copy',copied:'Copied!',update:'Update now',updated:'Updated!'},
+  ru:{babek:'Бабек',bail:'Баилова',cars:'Машин за период',park:'На парковкe',manual:'Ручных открытий',nf:'Не найдены',cf:'Закрытиe бесплатных сессий',cp:'Закрытие платных сессий',tickets:'Тикеты',count:'Количество',copy:'Копировать',copied:'Скопировано!',update:'Обновить',updated:'Обновлено!'}
+};
+const L=(k)=>t[window.__lang||'en'][k];
+function applyLang(){
+  document.getElementById('bHead').textContent=L('babek');
+  document.getElementById('lHead').textContent=L('bail');
+  ['lb1','ll1'].forEach(id=>document.getElementById(id).textContent=L('cars'));
+  ['lb2','ll2'].forEach(id=>document.getElementById(id).textContent=L('park'));
+  ['lb3','ll3'].forEach(id=>document.getElementById(id).textContent=L('manual'));
+  ['lb4','ll4'].forEach(id=>document.getElementById(id).textContent=L('nf'));
+  ['lb5','ll5'].forEach(id=>document.getElementById(id).textContent=L('cf'));
+  ['lb6','ll6'].forEach(id=>document.getElementById(id).textContent=L('cp'));
+  document.getElementById('ticketsH').textContent=L('tickets');
+  document.getElementById('ticketsL').textContent=L('count');
+  const _copyBtn=document.getElementById('copy'); _copyBtn.setAttribute('title', L('copy')); _copyBtn.setAttribute('aria-label', L('copy'));
+  const _updBtn=document.getElementById('updateNow'); if(_updBtn){ _updBtn.setAttribute('title', L('update')); _updBtn.setAttribute('aria-label', L('update')); }
+  document.getElementById('toast').textContent=L('copied');
+}
+applyLang();
+
+function pad(n){return n.toString().padStart(2,'0')}
+function fmt(d){return pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear()+' '+pad(d.getHours())+':'+pad(d.getMinutes())}
+function atTime(date,h,m){return new Date(date.getFullYear(),date.getMonth(),date.getDate(),h,m,0,0)}
+function computeShift(){
+const now=new Date();
+  const seven=atTime(now,7,0),nineteen=atTime(now,19,0);
+  let start,end;
+  if(now>=nineteen){end=nineteen;start=atTime(now,7,0)}
+  else if(now>=seven){end=seven;const y=new Date(now);y.setDate(now.getDate()-1);start=atTime(y,19,0)}
+  else{const y=new Date(now);y.setDate(now.getDate()-1);end=atTime(y,19,0);start=atTime(y,7,0)}
+  document.getElementById('startDT').value=fmt(start);
+  document.getElementById('endDT').value=fmt(end);
+}
+computeShift();
+window.addEventListener('focus', ()=>{ computeShift(); buildText(); });
+setInterval(()=>{ computeShift(); buildText(); }, 60000);
+window.addEventListener('focus', ()=>{ computeShift(); buildText(); });
+setInterval(()=>{ computeShift(); buildText(); }, 60000);
+
+
+function val(id){const el=document.getElementById(id);const v=el.value;return(v===''||isNaN(+v))?0:+v}
+function showToast(key){
+  const t=document.getElementById('toast');
+  t.textContent=L(key);
+  t.classList.remove('show');
+  void t.offsetWidth; /* reflow to restart animation */
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1500);
+}
+
+function buildText(){
+  const s=document.getElementById('startDT').value.trim();
+  const e=document.getElementById('endDT').value.trim();
+  const bb={
+    p:val('bb_period'),
+    on:val('bb_onparking'),
+    m:val('bb_manual'),
+    nf:val('bb_notfound'),
+    cf:val('bb_close_free'),
+    cp:val('bb_close_paid')
+  };
+  const bl={
+    p:val('bl_period'),
+    on:val('bl_onparking'),
+    m:val('bl_manual'),
+    nf:val('bl_notfound'),
+    cf:val('bl_close_free'),
+    cp:val('bl_close_paid')
+  };
+  const tickets=val('tickets');
+  const lines=[
+    s,
+    e,
+    '',
+    'Браво Бабек',
+    `Машин за период: ${bb.p}`,
+    `Не найдены: ${bb.nf}`,
+    `На парковкe: ${bb.on}`,
+    `Ручных открытий: ${bb.m}`,
+    `Закрытиe бесплатных сессий:${bb.cf}`,
+    `Закрытие платных сессий: ${bb.cp}`,
+    '',
+    'Браво Баилова',
+    `Машин за период: ${bl.p}`,
+    `Не найдены: ${bl.nf}`,
+    `На парковке: ${bl.on}`,
+    `Ручных открытий: ${bl.m}`,
+    `Бесплатный сессии закрыто: ${bl.cf}`,
+    `Платных сессий закрыто: ${bl.cp}`,
+    '',
+    '',
+    `Тикеты: ${tickets}`
+  ];
+  document.getElementById('out').value=lines.join('\n');
+}
+['bb_period','bb_onparking','bb_manual','bb_notfound','bb_close_free','bb_close_paid','bl_period','bl_onparking','bl_manual','bl_notfound','bl_close_free','bl_close_paid','tickets']
+  .forEach(id=>document.getElementById(id).addEventListener('input',buildText));
+buildText();
+
+document.getElementById('updateNow')?.addEventListener('click', ()=>{   computeShift(); buildText();   const tEl=document.getElementById('toast'); tEl.textContent=L('updated');   tEl.classList.add('show'); setTimeout(()=>{tEl.classList.remove('show')},1500);});
+document.getElementById('copy').onclick=async()=>{
+  await navigator.clipboard.writeText(document.getElementById('out').value);
+  showToast('copied');
+};
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f0f13">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Parqour">
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> <!-- prevent iOS zoom with font-size 16px too -->
+<title>Parqour Hub</title>
+<link rel="stylesheet" href="style.css?v=2">
+<script src="i18n.js"></script>
+<link rel="apple-touch-icon" href="icon-180.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+<link rel="apple-touch-startup-image" href="splash-2048x2732.png" media="(orientation: portrait)">
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <img src="parqour.png" alt="Parqour">
+    <div class="lang">
+      <button id="btnEN" onclick="__setLang('en')">EN</button>
+      <button id="btnRU" onclick="__setLang('ru')">RU</button>
+      <button id="btnAZ" onclick="__setLang('az')">AZ</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <a class="tile" href="counter.html">➕ Counter</a>
+    <a class="tile" href="report.html">🧾 Report (Отчёт)</a>
+  </div>
+
+  <div class="footer" id="footnote"></div>
+</div>
+
+<script>
+const t={
+  en:{counter:'➕ Counter', report:'🧾 Report', note:'All data is saved locally in your browser (persists after closing).'},
+  ru:{counter:'➕ Счётчик', report:'🧾 Отчёт', note:'Все данные сохраняются локально в вашем браузере (сохраняются после закрытия).'},
+  az:{counter:'➕ Sayğac', report:'🧾 Hesabat', note:'Bütün məlumatlar brauzerinizdə lokal saxlanılır (bağlandıqdan sonra da qalır).'}
+};
+function apply(){
+  const l=window.__lang||'en';
+  const lang = (t[l] ? l : 'en');
+
+  document.querySelectorAll('a.tile')[0].textContent=t[lang].counter;
+  document.querySelectorAll('a.tile')[1].textContent=t[lang].report;
+  document.getElementById('footnote').textContent=t[lang].note;
+
+  ['btnEN','btnRU','btnAZ'].forEach(id=>{
+    const b=document.getElementById(id);
+    if(b) b.classList.remove('active');
+  });
+  const map={en:'btnEN',ru:'btnRU',az:'btnAZ'};
+  const activeId=map[lang]||'btnEN';
+  const activeBtn=document.getElementById(activeId);
+  if(activeBtn) activeBtn.classList.add('active');
+}
+apply();
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>

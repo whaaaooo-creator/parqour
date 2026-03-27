@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="manifest" href="manifest.webmanifest?v=20260327b">
+<meta name="theme-color" content="#0f0f13">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Parqour">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Parqour — Support 2</title>
+<link rel="stylesheet" href="style.css?v=20260327b">
+<script src="i18n.js?v=20260327b"></script>
+<link rel="apple-touch-icon" href="icon-180.png?v=20260327b" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20260327b" />
+<link rel="apple-touch-startup-image" href="splash-2048x2732.png" media="(orientation: portrait)">
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <a class="home" href="index.html" aria-label="Home">
+      <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3z"/></svg>
+    </a>
+    <img src="parqour.png" alt="Parqour">
+  </div>
+
+  <input id="startDT" type="hidden" />
+  <input id="endDT" type="hidden" />
+
+  <div class="card supportcard">
+    <div class="support-grid" id="supportGrid"></div>
+    <div class="support-actions">
+      <button class="full" id="resetAll" style="background:#2a1f23;border-color:#4a2a32">Reset all</button>
+      <button class="full" id="copy" style="margin-top:10px">Copy report</button>
+    </div>
+  </div>
+
+  <div class="card copywrap" style="margin-top:12px">
+    <textarea class="ta" id="out" placeholder="Text will appear here…"></textarea>
+  </div>
+</div>
+<div class="toast" id="toast">Copied!</div>
+
+<script>
+const SUPPORT_KEYS = ['support2_1','support2_2','support2_3','support2_4','support2_5','support2_6','support2_7'];
+const t={
+  en:{
+    title:'Support 2',
+    metric:'Counter',
+    reset:'Reset all',
+    copy:'Copy report',
+    copied:'Copied!',
+    confirmReset:'Reset all counters?',
+    reportTitle:'Support 2',
+    line:'Counter'
+  },
+  ru:{
+    title:'Support 2',
+    metric:'Счётчик',
+    reset:'Сбросить всё',
+    copy:'Копировать отчёт',
+    copied:'Скопировано!',
+    confirmReset:'Сбросить все счётчики?',
+    reportTitle:'Support 2',
+    line:'Счётчик'
+  }
+};
+const L=(k)=>t[window.__lang||'en'][k];
+const get=(k,def=0)=>{const r=localStorage.getItem(k); if(r==null) return def; try{return JSON.parse(r)}catch{return r}};
+const set=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const grid=document.getElementById('supportGrid');
+function buildCounters(){
+  grid.innerHTML='';
+  SUPPORT_KEYS.forEach((key,idx)=>{
+    const wrap=document.createElement('div');
+    wrap.className='support-item';
+    wrap.innerHTML=`<div class="support-top"><div class="label support-label">${L('metric')} ${idx+1}</div><div id="value_${idx}" class="count support-count">0</div></div><div class="grid2" style="margin-top:12px"><button class="full" data-delta="1" data-key="${key}">+1</button><button class="full" data-delta="-1" data-key="${key}">−1</button></div>`;
+    grid.appendChild(wrap);
+  });
+}
+function renderCounts(){
+  SUPPORT_KEYS.forEach((key,idx)=>{
+    document.getElementById(`value_${idx}`).textContent=Number(get(key,0));
+  });
+}
+function inc(key,delta){
+  const next=Math.max(0, Number(get(key,0))+delta);
+  set(key,next);
+  renderCounts();
+  buildText();
+}
+function pad(n){return n.toString().padStart(2,'0')}
+function fmt(d){return pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear()+' '+pad(d.getHours())+':'+pad(d.getMinutes())}
+function atTime(date,h,m){return new Date(date.getFullYear(),date.getMonth(),date.getDate(),h,m,0,0)}
+function computeShift(){
+  const now=new Date();
+  const seven=atTime(now,7,0),nineteen=atTime(now,19,0);
+  let start,end;
+  if(now>=nineteen){end=nineteen;start=atTime(now,7,0)}
+  else if(now>=seven){end=seven;const y=new Date(now);y.setDate(now.getDate()-1);start=atTime(y,19,0)}
+  else{const y=new Date(now);y.setDate(now.getDate()-1);end=atTime(y,19,0);start=atTime(y,7,0)}
+  document.getElementById('startDT').value=fmt(start);
+  document.getElementById('endDT').value=fmt(end);
+}
+function buildText(){
+  const lines=[
+    document.getElementById('startDT').value.trim(),
+    document.getElementById('endDT').value.trim(),
+    '',
+    L('reportTitle')
+  ];
+  SUPPORT_KEYS.forEach((key,idx)=>lines.push(`${L('line')} ${idx+1}: ${Number(get(key,0))}`));
+  document.getElementById('out').value=lines.join('\n');
+}
+function showToast(textKey){
+  const el=document.getElementById('toast');
+  el.textContent=L(textKey);
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),1500);
+}
+function applyLang(){
+  document.getElementById('resetAll').textContent=L('reset');
+  document.getElementById('copy').textContent=L('copy');
+  document.getElementById('toast').textContent=L('copied');
+  document.querySelectorAll('.support-label').forEach((el,idx)=>el.textContent=`${L('metric')} ${idx+1}`);
+  buildText();
+}
+
+buildCounters();
+computeShift();
+renderCounts();
+applyLang();
+grid.addEventListener('click', (e)=>{
+  const btn=e.target.closest('button[data-key]');
+  if(!btn) return;
+  inc(btn.dataset.key, Number(btn.dataset.delta||0));
+});
+document.getElementById('resetAll').onclick=()=>{
+  if(confirm(L('confirmReset'))){
+    SUPPORT_KEYS.forEach(key=>set(key,0));
+    renderCounts();
+    buildText();
+  }
+};
+document.getElementById('copy').onclick=async()=>{
+  await navigator.clipboard.writeText(document.getElementById('out').value);
+  showToast('copied');
+};
+window.addEventListener('focus', ()=>{ computeShift(); buildText(); });
+setInterval(()=>{ computeShift(); buildText(); }, 60000);
+</script>
+<script>
+if('serviceWorker' in navigator){
+  let refreshing=false;
+  window.addEventListener('load', async ()=>{
+    try{
+      const reg=await navigator.serviceWorker.register('sw.js?v=20260327b');
+      await reg.update();
+      if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
+      reg.addEventListener('updatefound', ()=>{
+        const worker=reg.installing;
+        if(!worker) return;
+        worker.addEventListener('statechange', ()=>{
+          if(worker.state==='installed' && navigator.serviceWorker.controller) worker.postMessage({type:'SKIP_WAITING'});
+        });
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', ()=>{
+        if(refreshing) return;
+        refreshing=true;
+        location.reload();
+      });
+    }catch(e){}
+  });
+}
+</script>
+</body>
+</html>

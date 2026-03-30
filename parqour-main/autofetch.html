@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f0f13">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Parqour">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Parqour Auto Report</title>
+<link rel="stylesheet" href="style.css?v=7">
+<script src="i18n.js"></script>
+<link rel="apple-touch-icon" href="icon-180.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+<link rel="apple-touch-startup-image" href="splash-2048x2732.png" media="(orientation: portrait)">
+<style>
+.fetch-grid{display:grid;gap:12px}
+.fetch-actions{display:grid;gap:10px;grid-template-columns:1fr}
+.fetch-note{font-size:12px;line-height:1.4;color:var(--muted)}
+.fetch-status{margin-top:8px;font-size:13px;color:#cfd3db;min-height:18px}
+.fetch-primary{background:#1f4530 !important;border-color:#335c45 !important}
+@media (min-width:700px){
+  .fetch-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <a class="home" href="index.html" aria-label="Home">
+      <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3z"/></svg>
+    </a>
+    <img src="parqour.png" alt="Parqour">
+    <div class="lang">
+      <button id="btnRU" onclick="__setLang('ru')">RU</button>
+      <button id="btnAZ" onclick="__setLang('az')">AZ</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="fetch-grid">
+      <div class="field">
+        <label id="lblStart" for="startDT"></label>
+        <input id="startDT" class="num" type="datetime-local" />
+      </div>
+      <div class="field">
+        <label id="lblEnd" for="endDT"></label>
+        <input id="endDT" class="num" type="datetime-local" />
+      </div>
+    </div>
+    <div class="fetch-actions" style="margin-top:12px">
+      <button class="full fetch-primary" id="runBtn"></button>
+    </div>
+    <div class="fetch-status" id="status"></div>
+    <div class="fetch-note" id="note1" style="margin-top:10px"></div>
+    <div class="fetch-note" id="note2" style="margin-top:6px"></div>
+  </div>
+
+  <div class="card copywrap" style="margin-top:12px">
+    <textarea class="ta" id="out" placeholder=""></textarea>
+  </div>
+</div>
+<div class="toast" id="toast">Скопировано!</div>
+
+<script>
+const KOROGLU_BASE = 'https://bhk.parqour.com';
+const YANVAR20_BASE = 'https://bh20.parqour.com';
+const LSTR_KEY = 'autofetch_range';
+const t = {
+  ru: {
+    start:'Начало', end:'Конец', run:'Загрузить и скопировать', copied:'Скопировано!', running:'Получаю данные…', ready:'Данные получены и скопированы.',
+    failed:'Не удалось получить данные.',
+    note1:'Лучше работает, когда вы уже вошли в обе системы Parqour в этом браузере.',
+    note2:'Если хост блокирует cross origin запросы, эту страницу нужно размещать на том же сайте или API должен разрешать CORS.',
+    placeholder:'Готовый текст появится здесь…',
+    cors:'Запрос заблокирован. Скорее всего, нет входа в систему или этот хост приложения не имеет доступа к API.'
+  },
+  az: {
+    start:'Başlanğıc', end:'Son', run:'Yüklə və kopyala', copied:'Kopyalandı!', running:'Məlumatlar yüklənir…', ready:'Məlumatlar alındı və kopyalandı.',
+    failed:'Məlumatları almaq olmadı.',
+    note1:'Bu brauzerdə hər iki Parqour sisteminə əvvəlcədən daxil olmusunuzsa daha yaxşı işləyir.',
+    note2:'Host cross origin sorğuları bloklayırsa, bu səhifə eyni saytda yerləşməlidir və ya API CORS icazəsi verməlidir.',
+    placeholder:'Hazır mətn burada görünəcək…',
+    cors:'Sorğu bloklandı. Böyük ehtimalla giriş yoxdur və ya bu tətbiq hostunun API girişinə icazəsi yoxdur.'
+  }
+};
+const $ = (id) => document.getElementById(id);
+const lang = () => (window.__lang === 'az' ? 'az' : 'ru');
+const tr = (k) => (t[lang()] || t.ru)[k] || k;
+const OBJECTS = [
+  {
+    base: KOROGLU_BASE,
+    title: 'Браво Короглу',
+    parkingLine: 'На парковкe',
+    freeLine: 'Закрытиe бесплатных сессий:0',
+    paidLine: 'Закрытие платных сессий:0'
+  },
+  {
+    base: YANVAR20_BASE,
+    title: 'Браво 20 январ',
+    parkingLine: 'На парковке',
+    freeLine: 'Бесплатный сессии закрыто:0',
+    paidLine: 'Платных сессий закрыто:0'
+  }
+];
+
+function pad(n){ return String(n).padStart(2,'0'); }
+function dtLocal(date){
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+function loadDefaults(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(LSTR_KEY) || 'null');
+    if(saved && saved.start && saved.end){
+      $('startDT').value = saved.start;
+      $('endDT').value = saved.end;
+      return;
+    }
+  }catch(e){}
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 8, 0, 0, 0);
+  const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 20, 0, 0, 0);
+  $('startDT').value = dtLocal(start);
+  $('endDT').value = dtLocal(end);
+}
+function saveRange(){
+  localStorage.setItem(LSTR_KEY, JSON.stringify({start:$('startDT').value, end:$('endDT').value}));
+}
+function applyLang(){
+  $('lblStart').textContent = tr('start');
+  $('lblEnd').textContent = tr('end');
+  $('runBtn').textContent = tr('run');
+  $('note1').textContent = tr('note1');
+  $('note2').textContent = tr('note2');
+  $('out').placeholder = tr('placeholder');
+  $('toast').textContent = tr('copied');
+  $('btnRU').classList.toggle('active', lang()==='ru');
+  $('btnAZ').classList.toggle('active', lang()==='az');
+}
+function setStatus(text){ $('status').textContent = text || ''; }
+function showToast(text){
+  const el = $('toast');
+  el.textContent = text || tr('copied');
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 1500);
+}
+async function copyText(text){
+  if(navigator.clipboard && window.isSecureContext){
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  const ta = $('out');
+  ta.focus();
+  ta.select();
+  document.execCommand('copy');
+}
+function withYear2020(startValue){
+  if(!startValue) return startValue;
+  return startValue.replace(/^\d{4}/, '2020');
+}
+function makeCarStatePayload(dateFromString, dateToString, inParking){
+  return {
+    draw: 1,
+    columns: [
+      {data:'function',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+      {data:'function',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+      {data:'dimension',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+      {data:'inTimestampString',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+      {data:'inGate',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+      {data:'outTimestampString',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+      {data:'outGate',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+      {data:'duration',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+      {data:'function',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+      {data:'function',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+      {data:'function',name:'',searchable:true,orderable:false,search:{value:'',regex:false}}
+    ],
+    order:[{column:3,dir:'desc'}],
+    start:0,
+    length:10,
+    search:{value:'',regex:false},
+    customFilters:{
+      dateFromString,
+      dateToString,
+      plateNumber:'',
+      amount:'',
+      inGateId:'',
+      outGateId:'',
+      inParking:!!inParking,
+      carOutType:'',
+      carEntryType:''
+    }
+  };
+}
+function makeEventsPayload(){
+  return {
+    draw: 1,
+    columns: [
+      {data:'id',name:'',searchable:false,orderable:true,search:{value:'',regex:false}},
+      {data:'plateNumber',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+      {data:'created',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+      {data:'description',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+      {data:'eventType',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+      {data:'gate',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+      {data:'imgUrl',name:'',searchable:true,orderable:false,search:{value:'',regex:false}}
+    ],
+    order:[{column:0,dir:'desc'}],
+    start:0,
+    length:10,
+    search:{value:'',regex:false}
+  };
+}
+async function postJson(base, url, payload, refererPath){
+  const headers = {
+    'accept':'application/json, text/javascript, */*; q=0.01',
+    'content-type':'application/json',
+    'x-requested-with':'XMLHttpRequest'
+  };
+  const extra = {};
+  try{ extra.referrer = base + refererPath; }catch(e){}
+  let res;
+  try{
+    res = await fetch(url, {
+      method:'POST',
+      credentials:'include',
+      mode:'cors',
+      headers,
+      body: JSON.stringify(payload),
+      ...extra
+    });
+  }catch(err){
+    const e = new Error(tr('cors'));
+    e.cause = err;
+    throw e;
+  }
+  if(!res.ok){
+    throw new Error(`HTTP ${res.status}`);
+  }
+  return res.json();
+}
+function extractCount(obj){
+  if(obj && typeof obj.recordsFiltered === 'number') return obj.recordsFiltered;
+  if(obj && typeof obj.recordsTotal === 'number') return obj.recordsTotal;
+  if(obj && Array.isArray(obj.data)) return obj.data.length;
+  return 0;
+}
+async function fetchObjectStats(cfg, start, end){
+  const parkingStart = withYear2020(start);
+  const normal = await postJson(cfg.base, `${cfg.base}/rest/carstate`, makeCarStatePayload(start, end, false), '/journal/list?lang=ru');
+  const inside = await postJson(cfg.base, `${cfg.base}/rest/carstate`, makeCarStatePayload(parkingStart, end, true), '/journal/list?lang=ru');
+  const manual = await postJson(cfg.base, `${cfg.base}/rest/events?dateFromString=${encodeURIComponent(start)}&dateToString=${encodeURIComponent(end)}&plateNumber=&gateId=&eventType=MANUAL_GATE_OPEN&reasonId=`, makeEventsPayload(), '/events/list?lang=ru');
+  const notFound = await postJson(cfg.base, `${cfg.base}/rest/events?dateFromString=${encodeURIComponent(start)}&dateToString=${encodeURIComponent(end)}&plateNumber=&gateId=&eventType=MANUAL_GATE_OPEN&reasonId=1`, makeEventsPayload(), '/events/list?lang=ru');
+  return {
+    period: extractCount(normal),
+    notFound: extractCount(notFound),
+    inParking: extractCount(inside),
+    manualOpen: extractCount(manual)
+  };
+}
+function formatRuBlock(cfg, stats){
+  return [
+    cfg.title,
+    `Машин за период:${stats.period}`,
+    `Не найдены:${stats.notFound}`,
+    `${cfg.parkingLine}:${stats.inParking}`,
+    `Ручных открытий:${stats.manualOpen}`,
+    cfg.freeLine,
+    cfg.paidLine
+  ].join('\n');
+}
+function formatRuReport(start, end, results){
+  return [
+    start.replace('T',' '),
+    end.replace('T',' '),
+    '',
+    formatRuBlock(OBJECTS[0], results[0]),
+    '',
+    formatRuBlock(OBJECTS[1], results[1]),
+    '',
+    'Тикеты: 0'
+  ].join('\n');
+}
+async function runFetch(){
+  const start = $('startDT').value;
+  const end = $('endDT').value;
+  if(!start || !end){ setStatus(''); return; }
+  saveRange();
+  setStatus(tr('running'));
+  $('runBtn').disabled = true;
+  try{
+    const results = [];
+    for(const cfg of OBJECTS){
+      results.push(await fetchObjectStats(cfg, start, end));
+    }
+    const text = formatRuReport(start, end, results);
+    $('out').value = text;
+    await copyText(text);
+    setStatus(tr('ready'));
+    showToast(tr('copied'));
+  }catch(err){
+    console.error(err);
+    const msg = err && err.message ? err.message : tr('failed');
+    setStatus(msg);
+    $('out').value = 'ERROR\n\n' + msg;
+  }finally{
+    $('runBtn').disabled = false;
+  }
+}
+loadDefaults();
+applyLang();
+$('runBtn').addEventListener('click', runFetch);
+$('startDT').addEventListener('change', saveRange);
+$('endDT').addEventListener('change', saveRange);
+</script>
+<script src="pwa-update.js"></script>
+</body>
+</html>

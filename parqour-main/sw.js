@@ -1,4 +1,4 @@
-const APP_CACHE = 'parqour-cache-v20260331-1';
+const APP_CACHE = 'parqour-cache-v20260408-4';
 const CORE_ASSETS = [
   './',
   './index.html',
@@ -6,7 +6,7 @@ const CORE_ASSETS = [
   './report.html',
   './support2.html',
   './autofetch.html',
-  './style.css?v=10',
+  './style.css?v=13',
   './style.css',
   './i18n.js',
   './numeric.js',

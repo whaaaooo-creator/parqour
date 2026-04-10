@@ -27,25 +27,25 @@
 
   <div class="homegrid homegrid-clean">
     <a class="tilehome tile-clean tile-counter" href="counter.html" id="tileCounter">
-      <span class="tileicon tileicon-ring" aria-hidden="true"><img src="ring_home_v3.png" alt=""></span>
+      <span class="tileicon tileicon-ring" aria-hidden="true"><img src="ring_home.png" alt=""></span>
       <span class="tilelabel"></span>
       <span class="tileline" aria-hidden="true"></span>
     </a>
 
     <a class="tilehome tile-clean tile-support" href="support2.html" id="tileSupport2">
-      <span class="tileicon tileicon-doc" aria-hidden="true"><img src="document_home_v4.png" alt=""></span>
+      <span class="tileicon tileicon-ring" aria-hidden="true"><img src="ring_home.png" alt=""></span>
       <span class="tilelabel"></span>
       <span class="tileline" aria-hidden="true"></span>
     </a>
 
     <a class="tilehome tile-clean tile-report" href="report.html" id="tileReport">
-      <span class="tileicon tileicon-doc" aria-hidden="true"><img src="document_home_v4.png" alt=""></span>
+      <span class="tileicon tileicon-doc" aria-hidden="true"><img src="document_home.png" alt=""></span>
       <span class="tilelabel"></span>
       <span class="tileline" aria-hidden="true"></span>
     </a>
 
     <a class="tilehome tile-clean tile-auto" href="autofetch.html" id="tileAuto">
-      <span class="tileicon tileicon-doc" aria-hidden="true"><img src="document_home_v4.png" alt=""></span>
+      <span class="tileicon tileicon-doc" aria-hidden="true"><img src="document_home.png" alt=""></span>
       <span class="tilelabel"></span>
       <span class="tileline" aria-hidden="true"></span>
     </a>
@@ -56,8 +56,8 @@
 
 <script>
 const t={
-  ru:{counter:'Счётчик<br>сессий', support2:'Support II<br>отчёт', report:'Бабек<br>отчёт', auto:'Короглу<br>отчёт', note:'Все данные сохраняются локально в вашем браузере.'},
-  az:{counter:'Sessiya<br>sayan', support2:'Support II<br>hesabat', report:'Babək<br>hesabat', auto:'Koroğlu<br>hesabat', note:'Bütün məlumatlar brauzerinizdə lokal saxlanılır.'}
+  ru:{counter:'Счётчик<br>сессий', support2:'Support II', report:'Бабек<br>отчёт', auto:'Короглу<br>отчёт', note:'Все данные сохраняются локально в вашем браузере.'},
+  az:{counter:'Sessiya<br>sayan', support2:'Support II', report:'Babək<br>hesabat', auto:'Koroğlu<br>hesabat', note:'Bütün məlumatlar brauzerinizdə lokal saxlanılır.'}
 };
 function apply(){
   const l=(window.__lang==='az')?'az':'ru';

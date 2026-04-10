@@ -10,7 +10,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport"/>
 <title>Parqour — Отчёт</title>
-<link href="style.css?v=7" rel="stylesheet"/>
+<link href="style.css?v=11" rel="stylesheet"/>
 <script src="i18n.js"></script>
 <script defer src="numeric.js"></script>
 <link href="icon-180.png" rel="apple-touch-icon" />
@@ -97,24 +97,40 @@ applyLang();
 function pad(n){return n.toString().padStart(2,'0')}
 function fmt(d){return pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear()+' '+pad(d.getHours())+':'+pad(d.getMinutes())}
 function atTime(date,h,m){return new Date(date.getFullYear(),date.getMonth(),date.getDate(),h,m,0,0)}
-function computeShift(){
-  const now=new Date();
-  const seven=atTime(now,7,0), nineteen=atTime(now,19,0);
-  let start,end;
-  if(now>=nineteen){
-    end=nineteen;
-    start=atTime(now,7,0);
-  } else if(now>=seven){
-    end=seven;
-    const y=new Date(now); y.setDate(now.getDate()-1);
-    start=atTime(y,19,0);
-  } else {
-    const y=new Date(now); y.setDate(now.getDate()-1);
-    end=atTime(y,19,0);
-    start=atTime(y,7,0);
+function getNearestShiftRange(now=new Date()){
+  const points=[];
+  for(let d=-1; d<=1; d++){
+    const day=new Date(now.getFullYear(),now.getMonth(),now.getDate()+d,0,0,0,0);
+    points.push(new Date(day.getFullYear(),day.getMonth(),day.getDate(),8,0,0,0));
+    points.push(new Date(day.getFullYear(),day.getMonth(),day.getDate(),20,0,0,0));
   }
-  document.getElementById('startDT').value=fmt(start);
-  document.getElementById('endDT').value=fmt(end);
+  let nearest=points[0];
+  let best=Math.abs(now-nearest);
+  for(const point of points){
+    const diff=Math.abs(now-point);
+    if(diff<best){ best=diff; nearest=point; }
+  }
+  let start,end;
+  if(nearest.getHours()===20){
+    start=new Date(nearest.getFullYear(),nearest.getMonth(),nearest.getDate(),8,0,0,0);
+    end=new Date(nearest.getFullYear(),nearest.getMonth(),nearest.getDate(),20,0,0,0);
+  }else{
+    end=new Date(nearest.getFullYear(),nearest.getMonth(),nearest.getDate(),8,0,0,0);
+    start=new Date(end.getTime()-12*60*60*1000);
+  }
+  return {start,end};
+}
+function applyAutoShift(force=false){
+  const range=getNearestShiftRange();
+  const nextStart=fmt(range.start);
+  const nextEnd=fmt(range.end);
+  const changed=document.getElementById('startDT').value!==nextStart || document.getElementById('endDT').value!==nextEnd;
+  if(force || changed){
+    document.getElementById('startDT').value=nextStart;
+    document.getElementById('endDT').value=nextEnd;
+    return true;
+  }
+  return false;
 }
 
 function val(id){
@@ -167,13 +183,20 @@ function buildText(){
 const INPUT_IDS=['bb_period','bb_onparking','bb_manual','bb_notfound','bb_close_free','bb_close_paid','bl_period','bl_onparking','bl_manual','bl_notfound','bl_close_free','bl_close_paid','tickets'];
 INPUT_IDS.forEach(id=>document.getElementById(id).addEventListener('input',buildText));
 
-computeShift();
+applyAutoShift(true);
 buildText();
-window.addEventListener('focus', ()=>{ computeShift(); buildText(); });
-setInterval(()=>{ computeShift(); buildText(); }, 60000);
+const refreshShiftIfNeeded=()=>{
+  if(document.visibilityState==='hidden') return;
+  if(applyAutoShift(false)) buildText();
+  else buildText();
+};
+window.addEventListener('focus', refreshShiftIfNeeded);
+document.addEventListener('visibilitychange', refreshShiftIfNeeded);
+window.addEventListener('pageshow', refreshShiftIfNeeded);
+setInterval(refreshShiftIfNeeded, 30000);
 
 document.getElementById('updateNow').addEventListener('click', ()=>{
-  computeShift();
+  applyAutoShift(true);
   buildText();
   showToast('updated');
 });

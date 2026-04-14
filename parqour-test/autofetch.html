@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f0f13">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Parqour">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Parqour Koroğlu Report</title>
+<link rel="stylesheet" href="style.css?v=20260414pro2">
+<script src="i18n.js"></script>
+<link rel="apple-touch-icon" href="icon-180.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+<link rel="apple-touch-startup-image" href="splash-2048x2732.png" media="(orientation: portrait)">
+<style>
+.fetch-grid{display:grid;gap:12px}
+.fetch-actions{display:grid;gap:10px;grid-template-columns:1fr}
+.fetch-status{margin-top:8px;font-size:13px;color:var(--muted);min-height:18px}
+.fetch-primary{background:linear-gradient(180deg,#345dff 0%,#213fc6 100%) !important;border-color:#5377ff !important}
+.fetch-compact-wrap{margin-top:12px}
+.fetch-compact-wrap .ta{min-height:110px}
+.kcounter-shell{margin-top:12px;padding:14px;border-radius:22px;border:1px solid var(--border);background:linear-gradient(180deg,var(--surface-2) 0%, var(--surface-3) 100%);box-shadow:var(--shadow-soft)}
+.kcounter-picker{margin-bottom:12px}
+.kcounter-select{width:100%;padding:15px 48px 15px 18px;border-radius:18px;border:2px solid #3f78ff;background:linear-gradient(180deg,#14203a 0%,#0f1729 100%);color:var(--text);font-size:18px;font-weight:800;appearance:none;-webkit-appearance:none;background-image:linear-gradient(180deg,#14203a 0%,#0f1729 100%),linear-gradient(45deg,transparent 50%,#dbe7ff 50%),linear-gradient(135deg,#dbe7ff 50%,transparent 50%);background-position:left top,calc(100% - 24px) calc(50% - 3px),calc(100% - 18px) calc(50% - 3px);background-size:100% 100%,7px 7px,7px 7px;background-repeat:no-repeat;box-shadow:var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.04)}
+.kcounter-select:focus{outline:none;border-color:#6896ff;box-shadow:0 0 0 3px rgba(75,126,255,.18),var(--shadow-soft)}
+.kcounter-stack{display:flex;flex-direction:column;gap:12px}
+.kcounter-counter{padding:16px;border-radius:22px;border:1px solid var(--border);background:linear-gradient(180deg,rgba(22,29,46,.98) 0%,rgba(13,18,29,.98) 100%);box-shadow:var(--shadow-soft)}
+.kcounter-counterhead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.kcounter-label{font-size:16px;font-weight:800;color:var(--text-soft)}
+.kcounter-count{font-size:40px;line-height:1;font-weight:800;color:var(--text)}
+.kcounter-buttons{display:flex;align-items:stretch;gap:10px}
+.kcounter-btn{border:1px solid transparent;border-radius:18px;color:#fff;font-weight:800;letter-spacing:-.01em}
+.kcounter-btn.plus{flex:1;min-height:56px;font-size:21px;background:linear-gradient(180deg,#1cac8f 0%,#117564 100%);border-color:#279d83;box-shadow:0 8px 18px rgba(12,98,81,.18), inset 0 1px 0 rgba(255,255,255,.05)}
+.kcounter-btn.minus{width:80px;min-width:80px;min-height:50px;font-size:17px;background:linear-gradient(180deg,#7e3b53 0%,#5b2638 100%);border-color:#925168;box-shadow:0 6px 14px rgba(94,31,49,.16), inset 0 1px 0 rgba(255,255,255,.05)}
+.kcounter-outcard{margin-top:12px}
+.kcounter-out{min-height:100px}
+@media (min-width:700px){.fetch-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.fetch-compact-wrap .ta{min-height:100px}.kcounter-select{font-size:17px;padding:14px 44px 14px 16px}.kcounter-count{font-size:38px}.kcounter-btn.plus{min-height:52px;font-size:20px}.kcounter-btn.minus{width:76px;min-width:76px;min-height:46px;font-size:16px}.kcounter-out{min-height:96px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header header-no-lang">
+    <a class="home" href="index.html?v=20260414pro2" aria-label="Home">
+      <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3z"/></svg>
+    </a>
+    <img src="parqour.png" alt="Parqour">
+  </div>
+
+  <div class="card">
+    <div class="fetch-grid">
+      <div class="field">
+        <label id="lblStart" for="startDT"></label>
+        <input id="startDT" class="num" type="datetime-local" />
+      </div>
+      <div class="field">
+        <label id="lblEnd" for="endDT"></label>
+        <input id="endDT" class="num" type="datetime-local" />
+      </div>
+    </div>
+    <div class="fetch-actions" style="margin-top:12px">
+      <button class="full fetch-primary" id="runBtn"></button>
+    </div>
+    <div class="fetch-status" id="status"></div>
+  </div>
+
+  <div class="card copywrap fetch-compact-wrap">
+    <textarea class="ta" id="out" placeholder=""></textarea>
+  </div>
+
+
+  <div class="kcounter-shell">
+    <div class="kcounter-picker">
+      <select id="kObjectSelect" class="kcounter-select" aria-label="Объект">
+        <option value="placeholder"></option>
+      </select>
+    </div>
+
+    <div class="kcounter-stack">
+      <div class="kcounter-counter">
+        <div class="kcounter-counterhead">
+          <div class="kcounter-label" id="kFreeLabel">Бесплатные</div>
+          <div class="kcounter-count" id="kFreeCount">0</div>
+        </div>
+        <div class="kcounter-buttons">
+          <button class="kcounter-btn plus" id="kFreeInc">+1</button>
+          <button class="kcounter-btn minus" id="kFreeDec">−1</button>
+        </div>
+      </div>
+
+      <div class="kcounter-counter">
+        <div class="kcounter-counterhead">
+          <div class="kcounter-label" id="kPaidLabel">Платные</div>
+          <div class="kcounter-count" id="kPaidCount">0</div>
+        </div>
+        <div class="kcounter-buttons">
+          <button class="kcounter-btn plus" id="kPaidInc">+1</button>
+          <button class="kcounter-btn minus" id="kPaidDec">−1</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="kcounter-outcard">
+      <textarea class="kcounter-out" id="kOut"></textarea>
+    </div>
+  </div>
+
+</div>
+<div class="toast" id="toast">Скопировано!</div>
+
+<script>
+const KOROGLU_BASE = 'https://bhk.parqour.com';
+const YANVAR20_BASE = 'https://bh20.parqour.com';
+const LSTR_KEY = 'autofetch_range';
+const AUTO_TICK_MS = 30000;
+const t = {
+  ru: {
+    start:'Начало',
+    end:'Конец',
+    run:'Загрузить и скопировать',
+    copied:'Скопировано!',
+    running:'Получаю данные…',
+    ready:'Данные получены и скопированы.',
+    failed:'Не удалось получить данные.',
+    placeholder:'Готовый текст появится здесь…',
+    cors:'Запрос заблокирован.',
+    partial:'Не все объекты удалось загрузить.',
+    diag:'Диагностика',
+    ok:'OK',
+    hint:'iPhone Safari/PWA может блокировать cross-site cookie / CORS запросы.',
+    free:'Бесплатные',
+    paid:'Платные'
+  },
+  az: {
+    start:'Başlanğıc',
+    end:'Son',
+    run:'Yüklə və kopyala',
+    copied:'Kopyalandı!',
+    running:'Məlumatlar yüklənir…',
+    ready:'Məlumatlar alındı və kopyalandı.',
+    failed:'Məlumatları almaq olmadı.',
+    placeholder:'Hazır mətn burada görünəcək…',
+    cors:'Sorğu bloklandı.',
+    partial:'Bütün obyektləri yükləmək olmadı.',
+    diag:'Diaqnostika',
+    ok:'OK',
+    hint:'iPhone Safari/PWA cross-site cookie / CORS sorğularını bloklaya bilər.',
+    free:'Pulsuz',
+    paid:'Ödənişli'
+  }
+};
+const $ = (id) => document.getElementById(id);
+const lang = () => (window.__lang === 'az' ? 'az' : 'ru');
+const tr = (k) => (t[lang()] || t.ru)[k] || k;
+const OBJECTS = [
+  {
+    base: KOROGLU_BASE,
+    title: 'Браво Короглу',
+    parkingLine: 'На парковкe',
+    freeLine: 'Закрытиe бесплатных сессий:0',
+    paidLine: 'Закрытие платных сессий:0'
+  },
+  {
+    base: YANVAR20_BASE,
+    title: 'Браво 20 январ',
+    parkingLine: 'На парковке',
+    freeLine: 'Бесплатный сессии закрыто:0',
+    paidLine: 'Платных сессий закрыто:0'
+  }
+];
+
+function pad(n){ return String(n).padStart(2,'0'); }
+function dtLocal(date){
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+function getNearestShiftRange(now = new Date()){
+  const points = [];
+  for(let d = -1; d <= 1; d++){
+    const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() + d, 0, 0, 0, 0);
+    points.push(new Date(day.getFullYear(), day.getMonth(), day.getDate(), 8, 0, 0, 0));
+    points.push(new Date(day.getFullYear(), day.getMonth(), day.getDate(), 20, 0, 0, 0));
+  }
+  let nearest = points[0];
+  let best = Math.abs(now - nearest);
+  for(const point of points){
+    const diff = Math.abs(now - point);
+    if(diff < best){
+      best = diff;
+      nearest = point;
+    }
+  }
+  let start;
+  let end;
+  if(nearest.getHours() === 20){
+    start = new Date(nearest.getFullYear(), nearest.getMonth(), nearest.getDate(), 8, 0, 0, 0);
+    end = new Date(nearest.getFullYear(), nearest.getMonth(), nearest.getDate(), 20, 0, 0, 0);
+  }else{
+    end = new Date(nearest.getFullYear(), nearest.getMonth(), nearest.getDate(), 8, 0, 0, 0);
+    start = new Date(end.getTime() - 12 * 60 * 60 * 1000);
+  }
+  return { start, end };
+}
+function applyAutoShift(force = false){
+  const range = getNearestShiftRange();
+  const nextStart = dtLocal(range.start);
+  const nextEnd = dtLocal(range.end);
+  const changed = $('startDT').value !== nextStart || $('endDT').value !== nextEnd;
+  if(force || changed){
+    $('startDT').value = nextStart;
+    $('endDT').value = nextEnd;
+    saveRange();
+    return true;
+  }
+  return false;
+}
+function loadDefaults(){
+  applyAutoShift(true);
+}
+function saveRange(){
+  localStorage.setItem(LSTR_KEY, JSON.stringify({start:$('startDT').value, end:$('endDT').value}));
+}
+function applyLang(){
+  $('lblStart').textContent = tr('start');
+  $('lblEnd').textContent = tr('end');
+  $('runBtn').textContent = tr('run');
+  $('out').placeholder = tr('placeholder');
+  $('toast').textContent = tr('copied');
+}
+function setStatus(text){
+  $('status').textContent = text || '';
+}
+function showToast(text){
+  const el = $('toast');
+  el.textContent = text || tr('copied');
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 1500);
+}
+async function copyText(text){
+  if(navigator.clipboard && window.isSecureContext){
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  const ta = $('out');
+  ta.focus();
+  ta.select();
+  document.execCommand('copy');
+}
+function withYear2020(startValue){
+  if(!startValue) return startValue;
+  return startValue.replace(/^\d{4}/, '2020');
+}
+function makeCarStatePayload(dateFromString, dateToString, inParking){
+  return {
+    draw: 1,
+    columns: [
+      {data:'function',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+      {data:'function',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+      {data:'dimension',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+      {data:'inTimestampString',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+      {data:'inGate',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+      {data:'outTimestampString',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+      {data:'outGate',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+      {data:'duration',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+      {data:'function',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+      {data:'function',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+      {data:'function',name:'',searchable:true,orderable:false,search:{value:'',regex:false}}
+    ],
+    order:[{column:3,dir:'desc'}],
+    start:0,
+    length:10,
+    search:{value:'',regex:false},
+    customFilters:{
+      dateFromString,
+      dateToString,
+      plateNumber:'',
+      amount:'',
+      inGateId:'',
+      outGateId:'',
+      inParking:!!inParking,
+      carOutType:'',
+      carEntryType:''
+    }
+  };
+}
+function makeEventsPayload(){
+  return {
+    draw: 1,
+    columns: [
+      {data:'id',name:'',searchable:false,orderable:true,search:{value:'',regex:false}},
+      {data:'plateNumber',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+      {data:'created',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+      {data:'description',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+      {data:'eventType',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+      {data:'gate',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+      {data:'imgUrl',name:'',searchable:true,orderable:false,search:{value:'',regex:false}}
+    ],
+    order:[{column:0,dir:'desc'}],
+    start:0,
+    length:10,
+    search:{value:'',regex:false}
+  };
+}
+async function postJson(base, url, payload, refererPath){
+  const headers = {
+    'accept':'application/json, text/javascript, */*; q=0.01',
+    'content-type':'application/json',
+    'x-requested-with':'XMLHttpRequest'
+  };
+  const extra = {};
+  try{
+    extra.referrer = base + refererPath;
+  }catch(_){}
+  let res;
+  try{
+    res = await fetch(url, {
+      method:'POST',
+      credentials:'include',
+      mode:'cors',
+      headers,
+      body: JSON.stringify(payload),
+      ...extra
+    });
+  }catch(err){
+    const e = new Error(tr('cors'));
+    e.cause = err;
+    throw e;
+  }
+  if(!res.ok){
+    throw new Error(`HTTP ${res.status}`);
+  }
+  return res.json();
+}
+function extractCount(obj){
+  if(obj && typeof obj.recordsFiltered === 'number') return obj.recordsFiltered;
+  if(obj && typeof obj.recordsTotal === 'number') return obj.recordsTotal;
+  if(obj && Array.isArray(obj.data)) return obj.data.length;
+  return 0;
+}
+async function fetchObjectStats(cfg, start, end){
+  const parkingStart = withYear2020(start);
+  const normal = await postJson(cfg.base, `${cfg.base}/rest/carstate`, makeCarStatePayload(start, end, false), '/journal/list?lang=ru');
+  const inside = await postJson(cfg.base, `${cfg.base}/rest/carstate`, makeCarStatePayload(parkingStart, end, true), '/journal/list?lang=ru');
+  const manual = await postJson(cfg.base, `${cfg.base}/rest/events?dateFromString=${encodeURIComponent(start)}&dateToString=${encodeURIComponent(end)}&plateNumber=&gateId=&eventType=MANUAL_GATE_OPEN&reasonId=`, makeEventsPayload(), '/events/list?lang=ru');
+  const notFound = await postJson(cfg.base, `${cfg.base}/rest/events?dateFromString=${encodeURIComponent(start)}&dateToString=${encodeURIComponent(end)}&plateNumber=&gateId=&eventType=MANUAL_GATE_OPEN&reasonId=1`, makeEventsPayload(), '/events/list?lang=ru');
+  return {
+    period: extractCount(normal),
+    notFound: extractCount(notFound),
+    inParking: extractCount(inside),
+    manualOpen: extractCount(manual)
+  };
+}
+async function fetchObjectStatsSafe(cfg, start, end){
+  try{
+    const stats = await fetchObjectStats(cfg, start, end);
+    return { ok:true, cfg, stats };
+  }catch(error){
+    return { ok:false, cfg, error };
+  }
+}
+function formatRuBlock(cfg, stats){
+  return [
+    cfg.title,
+    `Машин за период:${stats.period}`,
+    `Не найдены:${stats.notFound}`,
+    `${cfg.parkingLine}:${stats.inParking}`,
+    `Ручных открытий:${stats.manualOpen}`,
+    cfg.freeLine,
+    cfg.paidLine
+  ].join('\n');
+}
+function formatRuDate(value){
+  const [d,t] = value.split('T');
+  const [y,m,day] = d.split('-');
+  return `${day}.${m}.${y} ${t}`;
+}
+function formatDiagnostics(start, end, results){
+  const lines = [
+    formatRuDate(start),
+    formatRuDate(end),
+    '',
+    tr('diag')
+  ];
+  for(const result of results){
+    if(result.ok){
+      lines.push(`${result.cfg.title}: ${tr('ok')}`);
+    }else{
+      const msg = result.error && result.error.message ? result.error.message : tr('failed');
+      lines.push(`${result.cfg.title}: ${msg}`);
+    }
+  }
+  lines.push('');
+  lines.push(tr('hint'));
+  return lines.join('\n');
+}
+function formatRuReport(start, end, results){
+  return [
+    formatRuDate(start),
+    formatRuDate(end),
+    '',
+    formatRuBlock(results[0].cfg, results[0].stats),
+    '',
+    formatRuBlock(results[1].cfg, results[1].stats),
+    '',
+    '',
+    'Тикеты: 0'
+  ].join('\n');
+}
+async function runFetch(){
+  const start = $('startDT').value;
+  const end = $('endDT').value;
+  if(!start || !end){
+    setStatus('');
+    return;
+  }
+  saveRange();
+  setStatus(tr('running'));
+  $('runBtn').disabled = true;
+  try{
+    const results = [];
+    for(const cfg of OBJECTS){
+      results.push(await fetchObjectStatsSafe(cfg, start, end));
+    }
+    const failed = results.filter(result => !result.ok);
+    if(failed.length){
+      $('out').value = formatDiagnostics(start, end, results);
+      setStatus(tr('partial'));
+      return;
+    }
+    const text = formatRuReport(start, end, results);
+    $('out').value = text;
+    await copyText(text);
+    setStatus(tr('ready'));
+    showToast(tr('copied'));
+  }catch(err){
+    console.error(err);
+    const msg = err && err.message ? err.message : tr('failed');
+    setStatus(msg);
+    $('out').value = 'ERROR\n\n' + msg;
+  }finally{
+    $('runBtn').disabled = false;
+  }
+}
+
+
+const KOBJ = [{id:'placeholder', name:'', reportRu:''}];
+const KCURRENT_KEY = 'koroglu_counter_current_object';
+function kCountKey(type, objectId){ return `koroglu_counter_${objectId}_${type}`; }
+function kGetCount(type, objectId){ return Number(localStorage.getItem(kCountKey(type, objectId)) || '0'); }
+function kSetCount(type, objectId, value){ localStorage.setItem(kCountKey(type, objectId), String(Math.max(0, value))); }
+function kCurrentId(){ return localStorage.getItem(KCURRENT_KEY) || 'placeholder'; }
+function kSetCurrentId(id){ localStorage.setItem(KCURRENT_KEY, id); }
+function kRenderSelect(){ $('kObjectSelect').innerHTML = KOBJ.map(o => `<option value="${o.id}">${o.name}</option>`).join(''); $('kObjectSelect').value = kCurrentId(); }
+function kRenderCurrent(){ const id = kCurrentId(); $('kObjectSelect').value = id; $('kFreeCount').textContent = kGetCount('free', id); $('kPaidCount').textContent = kGetCount('paid', id); }
+function kBuildText(){ $('kOut').value = ''; }
+function kChange(type, delta){ const id = kCurrentId(); kSetCount(type, id, kGetCount(type, id) + delta); kRenderCurrent(); kBuildText(); }
+function initKCounter(){
+  $('kFreeLabel').textContent = tr('free');
+  $('kPaidLabel').textContent = tr('paid');
+  kRenderSelect();
+  kRenderCurrent();
+  kBuildText();
+  $('kObjectSelect').addEventListener('change', e => { kSetCurrentId(e.target.value); kRenderCurrent(); kBuildText(); });
+  $('kFreeInc').addEventListener('click', () => kChange('free', 1));
+  $('kFreeDec').addEventListener('click', () => kChange('free', -1));
+  $('kPaidInc').addEventListener('click', () => kChange('paid', 1));
+  $('kPaidDec').addEventListener('click', () => kChange('paid', -1));
+}
+
+loadDefaults();
+applyLang();
+initKCounter();
+$('runBtn').addEventListener('click', runFetch);
+$('startDT').addEventListener('change', saveRange);
+$('endDT').addEventListener('change', saveRange);
+
+const refreshShiftIfNeeded = () => {
+  if(document.visibilityState === 'hidden') return;
+  applyAutoShift(false);
+};
+
+window.addEventListener('focus', refreshShiftIfNeeded);
+document.addEventListener('visibilitychange', refreshShiftIfNeeded);
+window.addEventListener('pageshow', refreshShiftIfNeeded);
+setInterval(refreshShiftIfNeeded, AUTO_TICK_MS);
+</script>
+<script src="pwa-update.js?v=20260414pro2"></script>
+</body>
+</html>

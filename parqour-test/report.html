@@ -1,0 +1,865 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f0f13">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Parqour">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Parqour Babek Report</title>
+<link rel="stylesheet" href="style.css?v=20260414pro7">
+<script src="i18n.js"></script>
+<link rel="apple-touch-icon" href="icon-180.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+<link rel="apple-touch-startup-image" href="splash-2048x2732.png" media="(orientation: portrait)">
+<style>
+.fetch-grid{display:grid;gap:12px}
+.fetch-actions{display:grid;gap:10px;grid-template-columns:1fr}
+.fetch-status{margin-top:8px;font-size:13px;color:var(--muted);min-height:18px}
+.fetch-primary{background:linear-gradient(180deg,#345dff 0%,#213fc6 100%) !important;border-color:#5377ff !important}
+.fetch-header{position:relative;justify-content:center}
+.fetch-header .home{position:absolute;left:0;top:50%;transform:translateY(-50%)}
+.fetch-header img{margin:0 auto}
+.fetch-compact-wrap{margin-top:12px;padding:0;border:none;background:none;box-shadow:none}
+.fetch-compact-wrap .ta{min-height:88px;font-size:12.5px;padding:10px 12px;border:2px dashed rgba(101,126,177,.72);border-radius:18px;background:rgba(10,15,26,.42)}
+.kcounter-out{border:2px dashed rgba(101,126,177,.72) !important;background:rgba(10,15,26,.42) !important}
+.kcounter-shell{margin-top:12px;padding:14px;border-radius:22px;border:1px solid var(--border);background:linear-gradient(180deg,var(--surface-2) 0%, var(--surface-3) 100%);box-shadow:var(--shadow-soft)}
+.kcounter-topbar{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"label label" "picker actions";gap:6px 8px;align-items:center;margin-bottom:12px}
+.kcounter-topleft{display:contents}
+.kcounter-toplabel{grid-area:label;margin:0 0 0 2px;font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.01em}
+.kcounter-topactions{grid-area:actions;display:flex;gap:8px;align-items:center;justify-self:end;position:static;transform:none}
+.kcounter-picker{grid-area:picker;margin-bottom:0;min-width:0}
+.kcounter-select{width:100%;padding:15px 48px 15px 18px;border-radius:18px;border:2px solid #3f78ff;background:linear-gradient(180deg,#14203a 0%,#0f1729 100%);color:var(--text);font-size:18px;font-weight:800;appearance:none;-webkit-appearance:none;background-image:linear-gradient(180deg,#14203a 0%,#0f1729 100%),linear-gradient(45deg,transparent 50%,#dbe7ff 50%),linear-gradient(135deg,#dbe7ff 50%,transparent 50%);background-position:left top,calc(100% - 24px) calc(50% - 3px),calc(100% - 18px) calc(50% - 3px);background-size:100% 100%,7px 7px,7px 7px;background-repeat:no-repeat;box-shadow:var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.04)}
+.kcounter-select:focus{outline:none;border-color:#6896ff;box-shadow:0 0 0 3px rgba(75,126,255,.18),var(--shadow-soft)}
+.kcounter-stack{display:flex;flex-direction:column;gap:12px}
+.kcounter-counter{padding:16px;border-radius:22px;border:1px solid var(--border);background:linear-gradient(180deg,rgba(22,29,46,.98) 0%,rgba(13,18,29,.98) 100%);box-shadow:var(--shadow-soft)}
+.kcounter-counterhead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}
+.kcounter-label{font-size:16px;font-weight:800;color:var(--text-soft)}
+.kcounter-count{font-size:40px;line-height:1;font-weight:800;color:var(--text)}
+.kcounter-buttons{display:flex;align-items:stretch;gap:10px}
+.kcounter-btn{border:1px solid transparent;border-radius:18px;color:#fff;font-weight:800;letter-spacing:-.01em}
+.kcounter-btn.plus{flex:1;min-height:56px;font-size:21px;background:linear-gradient(180deg,var(--success) 0%, var(--success-deep) 100%);border-color:#46cfb1;box-shadow:0 8px 18px rgba(14,93,78,.24), inset 0 1px 0 rgba(255,255,255,.05)}
+.kcounter-btn.minus{width:80px;min-width:80px;min-height:50px;font-size:17px;background:linear-gradient(180deg,var(--danger) 0%, var(--danger-deep) 100%);border-color:#de708a;box-shadow:0 6px 14px rgba(92,33,51,.24), inset 0 1px 0 rgba(255,255,255,.05)}
+.kcounter-outcard{margin-top:12px;padding:0;border:none;background:none;box-shadow:none}
+.kcounter-out{min-height:94px;font-size:13px;padding:10px 12px;border:2px dashed rgba(101,126,177,.72);border-radius:18px;background:rgba(10,15,26,.42)}
+.kcounter-history{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.kcounter-history[hidden]{display:none}
+.kcounter-historyitem{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 14px;border:1px solid rgba(61,74,106,.82);border-radius:18px;background:linear-gradient(180deg,rgba(18,24,38,.96) 0%,rgba(11,16,28,.96) 100%);box-shadow:var(--shadow-soft)}
+.kcounter-historytime{min-width:0;display:flex;align-items:center;gap:10px;color:var(--text);font-size:15px;font-weight:700;letter-spacing:-.01em;line-height:1.25}
+.kcounter-historytime::before{content:'';flex:0 0 auto;width:8px;height:8px;border-radius:999px;background:#5f87ff;box-shadow:0 0 0 4px rgba(95,135,255,.12)}
+.kcounter-historyactions{display:flex;gap:8px;align-items:center;justify-self:end}
+@media (min-width:700px){.fetch-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.fetch-compact-wrap .ta{min-height:84px}.kcounter-select{font-size:17px;padding:14px 44px 14px 16px}.kcounter-count{font-size:38px}.kcounter-btn.plus{min-height:52px;font-size:20px}.kcounter-btn.minus{width:76px;min-width:76px;min-height:46px;font-size:16px}.kcounter-out{min-height:90px}.kcounter-historyitem{padding:11px 12px}.kcounter-historytime{font-size:14px}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header fetch-header">
+    <a class="home" href="index.html?v=20260414pro7" aria-label="Home">
+      <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3z"/></svg>
+    </a>
+    <img src="parqour.png" alt="Parqour">
+  </div>
+
+  <div class="card">
+    <div class="fetch-grid">
+      <div class="field">
+        <label id="lblStart" for="startDT"></label>
+        <input id="startDT" class="num" type="datetime-local" />
+      </div>
+      <div class="field">
+        <label id="lblEnd" for="endDT"></label>
+        <input id="endDT" class="num" type="datetime-local" />
+      </div>
+    </div>
+    <div class="fetch-actions" style="margin-top:12px">
+      <button class="full fetch-primary" id="runBtn"></button>
+    </div>
+    <div class="fetch-status" id="status"></div>
+    <div class="fetch-compact-wrap">
+      <textarea class="ta" id="out" placeholder=""></textarea>
+    </div>
+  </div>
+
+  <div class="kcounter-shell">
+    <div class="kcounter-topbar">
+      <div class="kcounter-topleft">
+        <div class="kcounter-toplabel" id="kObjectLabel"></div>
+        <div class="kcounter-picker">
+          <select id="kObjectSelect" class="kcounter-select" aria-label="Object"></select>
+        </div>
+      </div>
+      <div class="kcounter-topactions">
+        <button class="support2-headbtn" id="kReset" aria-label="Reset" title="Reset"><svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8H6v11zm3.5-8h1.5v7h-1.5v-7zm5 0H16v7h-1.5v-7z"></path><path d="M9 4V3h6v1h5v2H4V4h5z"></path></svg></button>
+        <button class="support2-headbtn" id="kCopy" aria-label="Copy" title="Copy"><svg viewBox="0 0 24 24"><path d="M15 3H7a2 2 0 0 0-2 2v10h2V5h8V3z"></path><path d="M19 7H11a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zm0 12H11V9h8v10z"></path></svg></button>
+      </div>
+    </div>
+
+    <div class="kcounter-stack">
+      <div class="kcounter-counter">
+        <div class="kcounter-counterhead">
+          <div class="kcounter-label" id="kFreeLabel"></div>
+          <div class="kcounter-count" id="kFreeCount">0</div>
+        </div>
+        <div class="kcounter-buttons">
+          <button class="kcounter-btn plus" id="kFreeInc">+1</button>
+          <button class="kcounter-btn minus" id="kFreeDec">-1</button>
+        </div>
+      </div>
+
+      <div class="kcounter-counter">
+        <div class="kcounter-counterhead">
+          <div class="kcounter-label" id="kPaidLabel"></div>
+          <div class="kcounter-count" id="kPaidCount">0</div>
+        </div>
+        <div class="kcounter-buttons">
+          <button class="kcounter-btn plus" id="kPaidInc">+1</button>
+          <button class="kcounter-btn minus" id="kPaidDec">-1</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="kcounter-outcard">
+      <textarea class="kcounter-out" id="kOut"></textarea>
+    </div>
+    <div class="kcounter-history" id="kHistoryWrap" hidden></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const BABEK_BASE = 'https://bhb.parqour.com';
+const BAILOVA_BASE = 'https://bb.parqour.com';
+const LSTR_KEY = 'babek_report_range';
+const AUTO_TICK_MS = 30000;
+
+const CARSTATE_COLUMNS_BABEK = [
+  {data:'function',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'function',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+  {data:'dimension',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'inTimestampString',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+  {data:'inGate',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'outTimestampString',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+  {data:'outGate',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'duration',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'function',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'function',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'function',name:'',searchable:true,orderable:false,search:{value:'',regex:false}}
+];
+
+const CARSTATE_COLUMNS_BAILOVA = [
+  {data:'function',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'function',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+  {data:'inTimestampString',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+  {data:'inGate',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'outTimestampString',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+  {data:'outGate',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'duration',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'function',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'function',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'function',name:'',searchable:true,orderable:false,search:{value:'',regex:false}}
+];
+
+const EVENT_COLUMNS = [
+  {data:'id',name:'',searchable:false,orderable:true,search:{value:'',regex:false}},
+  {data:'plateNumber',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+  {data:'created',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+  {data:'description',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'eventType',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'gate',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'imgUrl',name:'',searchable:true,orderable:false,search:{value:'',regex:false}}
+];
+
+const t = {
+  ru: {
+    start:'\u041d\u0430\u0447\u0430\u043b\u043e',
+    end:'\u041a\u043e\u043d\u0435\u0446',
+    run:'\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c \u0438 \u0441\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c',
+    copied:'\u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u043e!',
+    running:'\u041f\u043e\u043b\u0443\u0447\u0430\u044e \u0434\u0430\u043d\u043d\u044b\u0435...',
+    ready:'\u0414\u0430\u043d\u043d\u044b\u0435 \u043f\u043e\u043b\u0443\u0447\u0435\u043d\u044b \u0438 \u0441\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u044b.',
+    failed:'\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u043f\u043e\u043b\u0443\u0447\u0438\u0442\u044c \u0434\u0430\u043d\u043d\u044b\u0435.',
+    placeholder:'\u0413\u043e\u0442\u043e\u0432\u044b\u0439 \u0442\u0435\u043a\u0441\u0442 \u043f\u043e\u044f\u0432\u0438\u0442\u0441\u044f \u0437\u0434\u0435\u0441\u044c...',
+    cors:'\u0417\u0430\u043f\u0440\u043e\u0441 \u0437\u0430\u0431\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u0430\u043d.',
+    partial:'\u041d\u0435 \u0432\u0441\u0435 \u043e\u0431\u044a\u0435\u043a\u0442\u044b \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044c.',
+    diag:'\u0414\u0438\u0430\u0433\u043d\u043e\u0441\u0442\u0438\u043a\u0430',
+    ok:'OK',
+    hint:'iPhone Safari/PWA \u043c\u043e\u0436\u0435\u0442 \u0431\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u0430\u0442\u044c cross-site cookie / CORS \u0437\u0430\u043f\u0440\u043e\u0441\u044b.',
+    copy:'\u041a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c',
+    free:'\u0411\u0435\u0441\u043f\u043b\u0430\u0442\u043d\u044b\u0435',
+    paid:'\u041f\u043b\u0430\u0442\u043d\u044b\u0435',
+    object:'\u041e\u0431\u044a\u0435\u043a\u0442',
+    reset:'\u0421\u0431\u0440\u043e\u0441\u0438\u0442\u044c'
+  },
+  az: {
+    start:'Ba\u015flan\u011f\u0131c',
+    end:'Son',
+    run:'Y\u00fckl\u0259 v\u0259 kopyala',
+    copied:'Kopyaland\u0131!',
+    running:'M\u0259lumatlar y\u00fckl\u0259nir...',
+    ready:'M\u0259lumatlar al\u0131nd\u0131 v\u0259 kopyaland\u0131.',
+    failed:'M\u0259lumatlar\u0131 almaq olmad\u0131.',
+    placeholder:'Haz\u0131r m\u0259tn burada g\u00f6r\u00fcn\u0259c\u0259k...',
+    cors:'Sor\u011fu blokland\u0131.',
+    partial:'B\u00fct\u00fcn obyektl\u0259ri y\u00fckl\u0259m\u0259k olmad\u0131.',
+    diag:'Diaqnostika',
+    ok:'OK',
+    hint:'iPhone Safari/PWA cross-site cookie / CORS sor\u011fular\u0131n\u0131 bloklaya bil\u0259r.',
+    copy:'Kopyala',
+    free:'Pulsuz',
+    paid:'\u00d6d\u0259ni\u015fli',
+    object:'M\u0259kan',
+    reset:'S\u0131f\u0131rla'
+  }
+};
+
+const $ = (id) => document.getElementById(id);
+const lang = () => (window.__lang === 'az' ? 'az' : 'ru');
+const tr = (k) => (t[lang()] || t.ru)[k] || k;
+const BABEK_HOME_URL = 'index.html?v=20260414pro7';
+
+function startOfDayLocal(date){
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+}
+
+function daysSinceAnchor(anchor, now){
+  return Math.floor((startOfDayLocal(now) - anchor) / 86400000);
+}
+
+function isBabekReportBlocked(now = new Date()){
+  const anchor = new Date(2026, 3, 16, 0, 0, 0, 0);
+  const diff = daysSinceAnchor(anchor, now);
+  if(diff < 0) return false;
+  const minutes = now.getHours() * 60 + now.getMinutes();
+  if(diff % 4 === 0){
+    return minutes >= (12 * 60) && minutes < (21 * 60);
+  }
+  if(diff % 4 === 2){
+    return minutes < (9 * 60);
+  }
+  return false;
+}
+
+function enforceBabekReportAvailability(now = new Date()){
+  if(!isBabekReportBlocked(now)) return false;
+  if(document.body) document.body.style.display = 'none';
+  window.location.replace(BABEK_HOME_URL);
+  return true;
+}
+
+const OBJECTS = [
+  {
+    base: BABEK_BASE,
+    title:'\u0411\u0440\u0430\u0432\u043e \u0411\u0430\u0431\u0435\u043a',
+    parkingLine:'\u041d\u0430 \u043f\u0430\u0440\u043a\u043e\u0432\u043a\u0435',
+    freeLine:'\u0417\u0430\u043a\u0440\u044b\u0442\u0438\u0435 \u0431\u0435\u0441\u043f\u043b\u0430\u0442\u043d\u044b\u0445 \u0441\u0435\u0441\u0441\u0438\u0439:0',
+    paidLine:'\u0417\u0430\u043a\u0440\u044b\u0442\u0438\u0435 \u043f\u043b\u0430\u0442\u043d\u044b\u0445 \u0441\u0435\u0441\u0441\u0438\u0439:0',
+    notFoundReasonId:7,
+    carStateColumns:CARSTATE_COLUMNS_BABEK,
+    carStateOrderColumn:3,
+    carStateFilterDefaults:{
+      plateNumber:'',
+      dimension:'',
+      amount:'',
+      inGateId:'',
+      outGateId:'',
+      includeDepartureTime:false,
+      carOutType:'',
+      carEntryType:''
+    },
+    journalRefererPath:'/journal/list?lang=ru',
+    eventsRefererPath:'/events/list?lang=ru'
+  },
+  {
+    base: BAILOVA_BASE,
+    title:'\u0411\u0440\u0430\u0432\u043e \u0411\u0430\u0438\u043b\u043e\u0432\u0430',
+    parkingLine:'\u041d\u0430 \u043f\u0430\u0440\u043a\u043e\u0432\u043a\u0435',
+    freeLine:'\u0417\u0430\u043a\u0440\u044b\u0442\u0438\u0435 \u0431\u0435\u0441\u043f\u043b\u0430\u0442\u043d\u044b\u0445 \u0441\u0435\u0441\u0441\u0438\u0439:0',
+    paidLine:'\u0417\u0430\u043a\u0440\u044b\u0442\u0438\u0435 \u043f\u043b\u0430\u0442\u043d\u044b\u0445 \u0441\u0435\u0441\u0441\u0438\u0439:0',
+    notFoundReasonId:1,
+    carStateColumns:CARSTATE_COLUMNS_BAILOVA,
+    carStateOrderColumn:2,
+    carStateFilterDefaults:{
+      plateNumber:'',
+      amount:'',
+      inGateId:'',
+      outGateId:'',
+      carOutType:''
+    },
+    journalRefererPath:'/journal/list',
+    eventsRefererPath:'/events/list?lang=ru'
+  }
+];
+
+const KOBJ = [
+  {id:'bravo_babek', name:'Bravo Bab\u0259k', reportRu:'Bravo Bab\u0259k'},
+  {id:'bravo_bayil', name:'Bravo Bay\u0131l', reportRu:'Bravo Bay\u0131l'},
+  {id:'bravo_yeni_gunesli', name:'Bravo Yeni G\u00fcn\u0259\u015fli', reportRu:'Bravo Yeni G\u00fcn\u0259\u015fli'},
+  {id:'bravo_bakixanov', name:'Bravo Bak\u0131xanov', reportRu:'Bravo Bak\u0131xanov'},
+  {id:'dunya_goz', name:'D\u00fcnya G\u00f6z', reportRu:'D\u00fcnya G\u00f6z'}
+];
+const KCURRENT_KEY = 'babek_counter_current_object';
+const KSHIFT_KEY = 'babek_counter_shift_key';
+const KLAST_RESET_KEY = 'babek_counter_last_reset_text';
+
+function pad(n){ return String(n).padStart(2, '0'); }
+
+function dtLocal(date){
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+function getNearestShiftRange(now = new Date()){
+  const points = [];
+  for(let d = -1; d <= 1; d++){
+    const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() + d, 0, 0, 0, 0);
+    points.push(new Date(day.getFullYear(), day.getMonth(), day.getDate(), 7, 0, 0, 0));
+    points.push(new Date(day.getFullYear(), day.getMonth(), day.getDate(), 19, 0, 0, 0));
+  }
+  let nearest = points[0];
+  let best = Math.abs(now - nearest);
+  for(const point of points){
+    const diff = Math.abs(now - point);
+    if(diff < best){
+      best = diff;
+      nearest = point;
+    }
+  }
+  let start;
+  let end;
+  if(nearest.getHours() === 19){
+    start = new Date(nearest.getFullYear(), nearest.getMonth(), nearest.getDate(), 7, 0, 0, 0);
+    end = new Date(nearest.getFullYear(), nearest.getMonth(), nearest.getDate(), 19, 0, 0, 0);
+  }else{
+    end = new Date(nearest.getFullYear(), nearest.getMonth(), nearest.getDate(), 7, 0, 0, 0);
+    start = new Date(end.getTime() - 12 * 60 * 60 * 1000);
+  }
+  return {start, end};
+}
+
+function applyAutoShift(force = false){
+  const range = getNearestShiftRange();
+  const nextStart = dtLocal(range.start);
+  const nextEnd = dtLocal(range.end);
+  const changed = $('startDT').value !== nextStart || $('endDT').value !== nextEnd;
+  if(force || changed){
+    $('startDT').value = nextStart;
+    $('endDT').value = nextEnd;
+    saveRange();
+    return true;
+  }
+  return false;
+}
+
+function loadDefaults(){
+  applyAutoShift(true);
+}
+
+function saveRange(){
+  localStorage.setItem(LSTR_KEY, JSON.stringify({start:$('startDT').value, end:$('endDT').value}));
+}
+
+function applyLang(){
+  $('lblStart').textContent = tr('start');
+  $('lblEnd').textContent = tr('end');
+  $('runBtn').textContent = tr('run');
+  $('out').placeholder = tr('placeholder');
+  $('toast').textContent = tr('copied');
+  $('kFreeLabel').textContent = tr('free');
+  $('kPaidLabel').textContent = tr('paid');
+  $('kObjectLabel').textContent = tr('object');
+  $('kReset').setAttribute('title', tr('reset'));
+  $('kReset').setAttribute('aria-label', tr('reset'));
+  $('kCopy').setAttribute('title', tr('copy'));
+  $('kCopy').setAttribute('aria-label', tr('copy'));
+}
+
+function setStatus(text){
+  $('status').textContent = text || '';
+}
+
+function showToast(text){
+  const el = $('toast');
+  el.textContent = text || tr('copied');
+  el.classList.remove('show');
+  void el.offsetWidth;
+  el.classList.add('show');
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(() => el.classList.remove('show'), 1500);
+}
+
+async function copyText(text){
+  if(navigator.clipboard && window.isSecureContext){
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.setAttribute('readonly', '');
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  ta.style.pointerEvents = 'none';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+}
+
+function withYear2020(startValue){
+  if(!startValue) return startValue;
+  return startValue.replace(/^\d{4}/, '2020');
+}
+
+function makeCarStatePayload(cfg, dateFromString, dateToString, inParking){
+  return {
+    draw: 1,
+    columns: cfg.carStateColumns,
+    order:[{column:cfg.carStateOrderColumn, dir:'desc'}],
+    start:0,
+    length:10,
+    search:{value:'', regex:false},
+    customFilters:{
+      dateFromString,
+      dateToString,
+      ...cfg.carStateFilterDefaults,
+      inParking:!!inParking
+    }
+  };
+}
+
+function makeEventsPayload(){
+  return {
+    draw: 1,
+    columns: EVENT_COLUMNS,
+    order:[{column:0, dir:'desc'}],
+    start:0,
+    length:10,
+    search:{value:'', regex:false}
+  };
+}
+
+async function postJson(base, url, payload, refererPath){
+  const headers = {
+    'accept':'application/json, text/javascript, */*; q=0.01',
+    'content-type':'application/json',
+    'x-requested-with':'XMLHttpRequest'
+  };
+  const extra = {};
+  try{
+    extra.referrer = base + refererPath;
+  }catch(_){}
+  let res;
+  try{
+    res = await fetch(url, {
+      method:'POST',
+      credentials:'include',
+      mode:'cors',
+      headers,
+      body: JSON.stringify(payload),
+      ...extra
+    });
+  }catch(err){
+    const e = new Error(tr('cors'));
+    e.cause = err;
+    throw e;
+  }
+  if(!res.ok){
+    throw new Error(`HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+function extractCount(obj){
+  if(obj && typeof obj.recordsFiltered === 'number') return obj.recordsFiltered;
+  if(obj && typeof obj.recordsTotal === 'number') return obj.recordsTotal;
+  if(obj && Array.isArray(obj.data)) return obj.data.length;
+  return 0;
+}
+
+async function fetchObjectStats(cfg, start, end){
+  const parkingStart = withYear2020(start);
+  const normal = await postJson(
+    cfg.base,
+    `${cfg.base}/rest/carstate`,
+    makeCarStatePayload(cfg, start, end, false),
+    cfg.journalRefererPath
+  );
+  const inside = await postJson(
+    cfg.base,
+    `${cfg.base}/rest/carstate`,
+    makeCarStatePayload(cfg, parkingStart, end, true),
+    cfg.journalRefererPath
+  );
+  const manual = await postJson(
+    cfg.base,
+    `${cfg.base}/rest/events?dateFromString=${encodeURIComponent(start)}&dateToString=${encodeURIComponent(end)}&plateNumber=&gateId=&eventType=MANUAL_GATE_OPEN&reasonId=`,
+    makeEventsPayload(),
+    cfg.eventsRefererPath
+  );
+  const notFound = await postJson(
+    cfg.base,
+    `${cfg.base}/rest/events?dateFromString=${encodeURIComponent(start)}&dateToString=${encodeURIComponent(end)}&plateNumber=&gateId=&eventType=MANUAL_GATE_OPEN&reasonId=${cfg.notFoundReasonId}`,
+    makeEventsPayload(),
+    cfg.eventsRefererPath
+  );
+  return {
+    period: extractCount(normal),
+    notFound: extractCount(notFound),
+    inParking: extractCount(inside),
+    manualOpen: extractCount(manual)
+  };
+}
+
+async function fetchObjectStatsSafe(cfg, start, end){
+  try{
+    const stats = await fetchObjectStats(cfg, start, end);
+    return {ok:true, cfg, stats};
+  }catch(error){
+    return {ok:false, cfg, error};
+  }
+}
+
+function formatRuBlock(cfg, stats){
+  return [
+    cfg.title,
+    `\u041c\u0430\u0448\u0438\u043d \u0437\u0430 \u043f\u0435\u0440\u0438\u043e\u0434:${stats.period}`,
+    `\u041d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u044b:${stats.notFound}`,
+    `${cfg.parkingLine}:${stats.inParking}`,
+    `\u0420\u0443\u0447\u043d\u044b\u0445 \u043e\u0442\u043a\u0440\u044b\u0442\u0438\u0439:${stats.manualOpen}`,
+    cfg.freeLine,
+    cfg.paidLine
+  ].join('\n');
+}
+
+function formatRuDate(value){
+  const [d, tValue] = value.split('T');
+  const [y, m, day] = d.split('-');
+  return `${day}.${m}.${y} ${tValue}`;
+}
+
+function formatDiagnostics(start, end, results){
+  const lines = [
+    formatRuDate(start),
+    formatRuDate(end),
+    '',
+    tr('diag')
+  ];
+  for(const result of results){
+    if(result.ok){
+      lines.push(`${result.cfg.title}: ${tr('ok')}`);
+    }else{
+      const msg = result.error && result.error.message ? result.error.message : tr('failed');
+      lines.push(`${result.cfg.title}: ${msg}`);
+    }
+  }
+  lines.push('');
+  lines.push(tr('hint'));
+  return lines.join('\n');
+}
+
+function formatRuReport(start, end, results){
+  return [
+    formatRuDate(start),
+    formatRuDate(end),
+    '',
+    formatRuBlock(results[0].cfg, results[0].stats),
+    '',
+    formatRuBlock(results[1].cfg, results[1].stats),
+    '',
+    '',
+    '\u0422\u0438\u043a\u0435\u0442\u044b: 0'
+  ].join('\n');
+}
+
+async function runFetch(){
+  const start = $('startDT').value;
+  const end = $('endDT').value;
+  if(!start || !end){
+    setStatus('');
+    return;
+  }
+  saveRange();
+  setStatus(tr('running'));
+  $('runBtn').disabled = true;
+  try{
+    const results = [];
+    for(const cfg of OBJECTS){
+      results.push(await fetchObjectStatsSafe(cfg, start, end));
+    }
+    const failed = results.filter(result => !result.ok);
+    if(failed.length){
+      $('out').value = formatDiagnostics(start, end, results);
+      setStatus(tr('partial'));
+      return;
+    }
+    const text = formatRuReport(start, end, results);
+    $('out').value = text;
+    await copyText(text);
+    setStatus(tr('ready'));
+    showToast(tr('copied'));
+  }catch(err){
+    console.error(err);
+    const msg = err && err.message ? err.message : tr('failed');
+    setStatus(msg);
+    $('out').value = `ERROR\n\n${msg}`;
+  }finally{
+    $('runBtn').disabled = false;
+  }
+}
+
+function kCountKey(type, objectId){ return `babek_counter_${objectId}_${type}`; }
+function kGetCount(type, objectId){ return Number(localStorage.getItem(kCountKey(type, objectId)) || '0'); }
+function kSetCount(type, objectId, value){ localStorage.setItem(kCountKey(type, objectId), String(Math.max(0, value))); }
+function kResetAllCounts(){
+  for(const object of KOBJ){
+    localStorage.removeItem(kCountKey('free', object.id));
+    localStorage.removeItem(kCountKey('paid', object.id));
+  }
+}
+function kResetAskText(){
+  return lang() === 'az'
+    ? 'Bab\u0259k say\u011faclar\u0131n\u0131n ham\u0131s\u0131 s\u0131f\u0131rlans\u0131n?'
+    : '\u0421\u0431\u0440\u043e\u0441\u0438\u0442\u044c \u0432\u0441\u0435 \u0441\u0447\u0451\u0442\u0447\u0438\u043a\u0438 \u0411\u0430\u0431\u0435\u043a?';
+}
+function kResetDoneText(){
+  return lang() === 'az'
+    ? 'Say\u011faclar s\u0131f\u0131rland\u0131!'
+    : '\u0421\u0447\u0451\u0442\u0447\u0438\u043a\u0438 \u0441\u0431\u0440\u043e\u0448\u0435\u043d\u044b!';
+}
+function kCurrentId(){
+  const saved = localStorage.getItem(KCURRENT_KEY);
+  return KOBJ.some(o => o.id === saved) ? saved : KOBJ[0].id;
+}
+function kSetCurrentId(id){ localStorage.setItem(KCURRENT_KEY, id); }
+function kRenderSelect(){
+  const select = $('kObjectSelect');
+  if(!select) return;
+  select.innerHTML = KOBJ.map(o => `<option value="${o.id}">${o.name}</option>`).join('');
+  select.value = kCurrentId();
+}
+function kRenderCurrent(){
+  const id = kCurrentId();
+  $('kObjectSelect').value = id;
+  $('kFreeCount').textContent = kGetCount('free', id);
+  $('kPaidCount').textContent = kGetCount('paid', id);
+}
+function kFormatStamp(date){
+  return `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+function kGetNightShiftRange(now = new Date()){
+  let start;
+  let end;
+  if(now.getHours() >= 19){
+    start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 19, 0, 0, 0);
+    end = new Date(start.getTime() + 12 * 60 * 60 * 1000);
+  }else{
+    end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 7, 0, 0, 0);
+    start = new Date(end.getTime() - 12 * 60 * 60 * 1000);
+  }
+  return {start, end};
+}
+function kShiftKeyFromRange(range){
+  return `${range.start.getFullYear()}-${pad(range.start.getMonth() + 1)}-${pad(range.start.getDate())}T${pad(range.start.getHours())}:${pad(range.start.getMinutes())}`;
+}
+function kCurrentShiftKey(now = new Date()){
+  return kShiftKeyFromRange(kGetNightShiftRange(now));
+}
+function kComposeText(range = kGetNightShiftRange()){
+  const lines = [
+    kFormatStamp(range.start),
+    kFormatStamp(range.end),
+    ''
+  ];
+  for(const object of KOBJ){
+    lines.push(`*${object.reportRu}*`);
+    lines.push(`\u0411\u0435\u0441\u043f\u043b\u0430\u0442\u043d\u044b\u0435 \u0441\u0435\u0441\u0441\u0438\u0438: ${kGetCount('free', object.id)}`);
+    lines.push(`\u041f\u043b\u0430\u0442\u043d\u044b\u0435 \u0441\u0435\u0441\u0441\u0438\u0438: ${kGetCount('paid', object.id)}`);
+  }
+  return lines.join('\n');
+}
+function kBuildText(){
+  $('kOut').value = kComposeText();
+}
+function kResetHistory(){
+  const raw = localStorage.getItem(KLAST_RESET_KEY);
+  if(!raw) return [];
+  try{
+    const parsed = JSON.parse(raw);
+    if(Array.isArray(parsed)){
+      const cleaned = parsed
+        .map(item => typeof item === 'string' ? item.trim() : '')
+        .filter(item => item && !item.includes('\n') && !item.includes('*'));
+      if(JSON.stringify(cleaned) !== JSON.stringify(parsed)){
+        localStorage.setItem(KLAST_RESET_KEY, JSON.stringify(cleaned));
+      }
+      return cleaned;
+    }
+  }catch(_){}
+  const legacy = raw.trim();
+  if(!legacy || legacy.includes('\n') || legacy.includes('*')){
+    localStorage.removeItem(KLAST_RESET_KEY);
+    return [];
+  }
+  const migrated = [legacy];
+  localStorage.setItem(KLAST_RESET_KEY, JSON.stringify(migrated));
+  return migrated;
+}
+function kSaveResetHistory(items){
+  const cleaned = items
+    .map(item => typeof item === 'string' ? item.trim() : '')
+    .filter(Boolean);
+  if(!cleaned.length){
+    localStorage.removeItem(KLAST_RESET_KEY);
+    kRenderLastReset();
+    return;
+  }
+  localStorage.setItem(KLAST_RESET_KEY, JSON.stringify(cleaned));
+  kRenderLastReset();
+}
+function kHistoryButtonMarkup(action, index, title){
+  const icon = action === 'delete'
+    ? '<svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8H6v11zm3.5-8h1.5v7h-1.5v-7zm5 0H16v7h-1.5v-7z"></path><path d="M9 4V3h6v1h5v2H4V4h5z"></path></svg>'
+    : '<svg viewBox="0 0 24 24"><path d="M15 3H7a2 2 0 0 0-2 2v10h2V5h8V3z"></path><path d="M19 7H11a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zm0 12H11V9h8v10z"></path></svg>';
+  return `<button class="support2-headbtn" type="button" data-history-action="${action}" data-history-index="${index}" aria-label="${title}" title="${title}">${icon}</button>`;
+}
+function kEscapeHtml(text){
+  return String(text)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+function kRenderLastReset(){
+  const wrap = $('kHistoryWrap');
+  if(!wrap) return;
+  const items = kResetHistory();
+  wrap.hidden = items.length === 0;
+  wrap.innerHTML = items.map((item, index) => `
+    <div class="kcounter-historyitem">
+      <div class="kcounter-historytime">${kEscapeHtml(item)}</div>
+      <div class="kcounter-historyactions">
+        ${kHistoryButtonMarkup('delete', index, tr('reset'))}
+        ${kHistoryButtonMarkup('copy', index, tr('copy'))}
+      </div>
+    </div>
+  `).join('');
+}
+function kPushResetHistory(text){
+  const value = (text || '').trim();
+  if(!value) return;
+  const items = kResetHistory();
+  items.unshift(value);
+  kSaveResetHistory(items);
+}
+function kArchiveShiftText(){
+  kPushResetHistory(kFormatStamp(new Date()));
+}
+function kRemoveResetHistoryItem(index){
+  const items = kResetHistory();
+  if(index < 0 || index >= items.length) return;
+  items.splice(index, 1);
+  kSaveResetHistory(items);
+}
+function kResetForCurrentShift(){
+  kArchiveShiftText();
+  kResetAllCounts();
+  localStorage.setItem(KSHIFT_KEY, kCurrentShiftKey());
+  kRenderCurrent();
+  kBuildText();
+}
+function kSyncShiftReset(now = new Date()){
+  const nextShiftKey = kCurrentShiftKey(now);
+  const storedShiftKey = localStorage.getItem(KSHIFT_KEY);
+  if(!storedShiftKey){
+    localStorage.setItem(KSHIFT_KEY, nextShiftKey);
+    return false;
+  }
+  if(storedShiftKey === nextShiftKey) return false;
+  kArchiveShiftText();
+  kResetAllCounts();
+  localStorage.setItem(KSHIFT_KEY, nextShiftKey);
+  kRenderCurrent();
+  kBuildText();
+  return true;
+}
+function kChange(type, delta){
+  const id = kCurrentId();
+  kSetCount(type, id, kGetCount(type, id) + delta);
+  kRenderCurrent();
+  kBuildText();
+}
+function initKCounter(){
+  kRenderSelect();
+  kSyncShiftReset();
+  kRenderCurrent();
+  kBuildText();
+  kRenderLastReset();
+  $('kObjectSelect').addEventListener('change', (e) => {
+    kSetCurrentId(e.target.value);
+    kRenderCurrent();
+    kBuildText();
+  });
+  $('kFreeInc').addEventListener('click', () => kChange('free', 1));
+  $('kFreeDec').addEventListener('click', () => kChange('free', -1));
+  $('kPaidInc').addEventListener('click', () => kChange('paid', 1));
+  $('kPaidDec').addEventListener('click', () => kChange('paid', -1));
+  $('kReset').addEventListener('click', () => {
+    if(!confirm(kResetAskText())) return;
+    kResetForCurrentShift();
+    showToast(kResetDoneText());
+  });
+  $('kCopy').addEventListener('click', async () => {
+    try { await copyText($('kOut').value); } catch(_) {}
+    showToast(tr('copied'));
+  });
+  $('kHistoryWrap').addEventListener('click', async (event) => {
+    const button = event.target.closest('button[data-history-action]');
+    if(!button) return;
+    const index = Number(button.dataset.historyIndex);
+    const items = kResetHistory();
+    const text = items[index];
+    if(!text) return;
+    if(button.dataset.historyAction === 'delete'){
+      kRemoveResetHistoryItem(index);
+      return;
+    }
+    try { await copyText(text); } catch(_) {}
+    showToast(tr('copied'));
+  });
+}
+
+if(!enforceBabekReportAvailability()){
+  loadDefaults();
+  applyLang();
+  try{
+    initKCounter();
+  }catch(err){
+    console.error(err);
+    if($('kOut')) $('kOut').value = `KCounter error\n\n${err && err.message ? err.message : err}`;
+  }
+  $('runBtn').addEventListener('click', runFetch);
+  $('startDT').addEventListener('change', saveRange);
+  $('endDT').addEventListener('change', saveRange);
+}
+
+const refreshShiftIfNeeded = () => {
+  if(enforceBabekReportAvailability()) return;
+  if(document.visibilityState === 'hidden') return;
+  applyAutoShift(false);
+  if(typeof kSyncShiftReset === 'function'){
+    const resetDone = kSyncShiftReset();
+    if(!resetDone && $('kOut')) kBuildText();
+  }
+};
+
+window.addEventListener('focus', refreshShiftIfNeeded);
+document.addEventListener('visibilitychange', refreshShiftIfNeeded);
+window.addEventListener('pageshow', refreshShiftIfNeeded);
+setInterval(refreshShiftIfNeeded, AUTO_TICK_MS);
+</script>
+<script src="pwa-update.js?v=20260414pro7"></script>
+</body>
+</html>

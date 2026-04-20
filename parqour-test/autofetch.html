@@ -19,6 +19,8 @@
 .fetch-actions{display:grid;gap:10px;grid-template-columns:1fr}
 .fetch-status{margin-top:8px;font-size:13px;color:var(--muted);min-height:18px}
 .fetch-primary{background:linear-gradient(180deg,#345dff 0%,#213fc6 100%) !important;border-color:#5377ff !important}
+.fetch-card-main{position:relative}
+.fetch-report-light{position:absolute;top:16px;right:18px;z-index:2}
 .fetch-header{position:relative;justify-content:center}
 .fetch-header .home{position:absolute;left:0;top:50%;transform:translateY(-50%)}
 .fetch-header img{margin:0 auto}
@@ -30,7 +32,7 @@
 .session-object-side{display:inline-flex;align-items:center;gap:12px;justify-self:end}
 .session-object-stats{display:inline-flex;align-items:center;gap:12px}
 .session-object-stat{display:grid;grid-template-columns:17px 3ch;align-items:center;column-gap:6px;width:calc(17px + 6px + 3ch)}
-.session-object-count{display:inline-block;width:3ch;text-align:right;font-variant-numeric:tabular-nums}
+.session-object-count{display:inline-block;width:3ch;text-align:left;font-variant-numeric:tabular-nums}
 .session-object-icon{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;flex:0 0 17px}
 .session-object-icon-mask{display:block;width:17px;height:17px;background-color:currentColor;-webkit-mask-image:var(--session-icon);mask-image:var(--session-icon);-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;-webkit-mask-size:contain;mask-size:contain}
 .session-object-light{position:relative;display:inline-flex;align-items:center;justify-content:center;width:10px;height:10px;flex:0 0 10px;border-radius:999px;background:rgba(173,182,207,.38);box-shadow:0 0 0 1px rgba(173,182,207,.12)}
@@ -263,7 +265,7 @@ const OBJECTS = [
 const SESSION_OBJECTS = [
   {
     id: 'bravo_koroglu',
-    name: 'Bravo Koroglu',
+    name: 'Koroglu',
     reportRu: 'Bravo Koroglu',
     base: 'https://bhk.parqour.com',
     buttonId: 'sessionObjectBtn1',
@@ -279,7 +281,7 @@ const SESSION_OBJECTS = [
   },
   {
     id: 'bravo_yeni_yasamal',
-    name: 'Bravo Yeni Yasamal',
+    name: 'Yeni Yasamal',
     reportRu: 'Bravo Yeni Yasamal',
     base: 'https://byy.parqour.com',
     buttonId: 'sessionObjectBtn3',
@@ -287,7 +289,7 @@ const SESSION_OBJECTS = [
   },
   {
     id: 'bravo_shuvelan',
-    name: 'Bravo Shuvelan',
+    name: 'Shuvelan',
     reportRu: 'Bravo Shuvelan',
     base: 'https://bhs.parqour.com',
     buttonId: 'sessionObjectBtn4',
@@ -295,7 +297,7 @@ const SESSION_OBJECTS = [
   },
   {
     id: 'bravo_oazis',
-    name: 'Bravo Oazis',
+    name: 'Oazis',
     reportRu: 'Bravo Oazis',
     base: 'https://bso.parqour.com',
     buttonId: 'sessionObjectBtn5',
@@ -749,11 +751,10 @@ function buildSessionText(start, end, results){
     formatRuDate(end)
   ];
   if(results.length) lines.push('');
-  results.forEach((result, index) => {
+  results.forEach((result) => {
     lines.push(`*${result.object.reportRu}*`);
-    lines.push(`\u0411\u0435\u0441\u043f\u043b\u0430\u0442\u043d\u044b\u0435 \u0441\u0435\u0441\u0441\u0438\u0438: ${result.stats.free}`);
-    lines.push(`\u041f\u043b\u0430\u0442\u043d\u044b\u0435 \u0441\u0435\u0441\u0441\u0438\u0438: ${result.stats.paid}`);
-    if(index < results.length - 1) lines.push('');
+    lines.push(`\u0411\u0435\u0441\u043f\u043b\u0430\u0442\u043d\u044b\u0435 \u0441\u0435\u0441\u0441\u0438\u0438:${result.stats.free}`);
+    lines.push(`\u041f\u043b\u0430\u0442\u043d\u044b\u0435 \u0441\u0435\u0441\u0441\u0438\u0438:${result.stats.paid}`);
   });
   return lines.join('\n');
 }

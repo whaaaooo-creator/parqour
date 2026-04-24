@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f1118">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Parqour">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Parqour - Support 2</title>
+<link rel="stylesheet" href="style.css?v=20260414pro7">
+<script src="i18n.js"></script>
+<link rel="apple-touch-icon" href="icon-180.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+<link rel="apple-touch-startup-image" href="splash-2048x2732.png" media="(orientation: portrait)">
+<style>
+.support2-page{padding-top:calc(18px + var(--safe-top))}
+.support2-header{position:relative;display:flex;justify-content:center;align-items:center;margin-bottom:18px;padding-top:6px}
+.support2-header .home{position:absolute;left:0;top:50%;transform:translateY(-50%)}
+.support2-header img{width:min(168px, calc(100vw - 186px));height:auto;display:block}
+.fetch-grid{display:grid;gap:12px}
+.fetch-actions{display:grid;gap:10px;grid-template-columns:1fr}
+.fetch-status{margin-top:8px;font-size:13px;color:var(--muted);min-height:18px}
+.fetch-primary{background:linear-gradient(180deg,#345dff 0%,#213fc6 100%) !important;border-color:#5377ff !important}
+.fetch-compact-wrap{margin-top:12px;padding:0;border:none;background:none;box-shadow:none}
+.fetch-compact-wrap .ta{min-height:88px;font-size:12.5px;padding:10px 12px;border:2px dashed rgba(101,126,177,.72);border-radius:18px;background:rgba(10,15,26,.42)}
+.session-object-list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.session-object-btn{width:100%;padding:15px 18px;border-radius:18px;border:1px solid rgba(61,74,106,.82);background:linear-gradient(180deg,rgba(22,29,46,.98) 0%,rgba(13,18,29,.98) 100%);color:var(--text);font-size:16px;font-weight:800;line-height:1.3;text-align:left;white-space:normal;box-shadow:var(--shadow-soft)}
+.session-object-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px}
+.session-object-title{display:block;min-width:0;font-size:16px;font-weight:800;color:var(--text)}
+.session-object-side{display:inline-flex;align-items:center;gap:12px;justify-self:end}
+.session-object-stats{display:inline-flex;align-items:center;gap:12px}
+.session-object-stat{display:grid;grid-template-columns:17px 3ch;align-items:center;column-gap:6px;width:calc(17px + 6px + 3ch)}
+.session-object-count{display:inline-block;width:3ch;text-align:left;font-variant-numeric:tabular-nums}
+.session-object-icon{display:inline-flex;align-items:center;justify-content:center;width:17px;height:17px;flex:0 0 17px}
+.session-object-icon-mask{display:block;width:17px;height:17px;background-color:currentColor;-webkit-mask-image:var(--session-icon);mask-image:var(--session-icon);-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;-webkit-mask-size:contain;mask-size:contain}
+.session-object-light{position:relative;display:inline-flex;align-items:center;justify-content:center;width:10px;height:10px;flex:0 0 10px;border-radius:999px;background:rgba(173,182,207,.38);box-shadow:0 0 0 1px rgba(173,182,207,.12)}
+.session-object-light::after{content:'';position:absolute;inset:-4px;border-radius:999px;background:transparent}
+.session-object-light.is-loading{background:#ffd347;box-shadow:0 0 0 1px rgba(255,211,71,.18),0 0 12px rgba(255,211,71,.45)}
+.session-object-light.is-loading::after{background:rgba(255,211,71,.26);animation:sessionPulse 1.15s ease-in-out infinite}
+.session-object-light.is-ready{background:#3cd28f;box-shadow:0 0 0 1px rgba(60,210,143,.2),0 0 12px rgba(60,210,143,.42)}
+.session-object-light.is-error{background:#ff6f87;box-shadow:0 0 0 1px rgba(255,111,135,.18),0 0 12px rgba(255,111,135,.32)}
+.session-object-btn.is-loading{opacity:.82}
+.session-object-btn.is-error{border-color:#de708a}
+@keyframes sessionPulse{
+  0%,100%{transform:scale(.7);opacity:.38}
+  50%{transform:scale(1.35);opacity:.9}
+}
+@media (min-width:700px){.fetch-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.support2-header img{width:min(160px, calc(100vw - 176px))}.fetch-compact-wrap .ta{min-height:84px}}
+</style>
+</head>
+<body>
+<div class="container support2-page">
+  <div class="support2-header">
+    <a class="home" href="index.html?v=20260414pro7" aria-label="Home">
+      <svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6H11v6H6v-9H3z"/></svg>
+    </a>
+    <img src="parqour.png" alt="Parqour">
+  </div>
+
+  <div class="card">
+    <div class="fetch-grid">
+      <div class="field">
+        <label id="sessionStartLabel" for="sessionStartDT"></label>
+        <input id="sessionStartDT" class="num" type="datetime-local" />
+      </div>
+      <div class="field">
+        <label id="sessionEndLabel" for="sessionEndDT"></label>
+        <input id="sessionEndDT" class="num" type="datetime-local" />
+      </div>
+    </div>
+    <div class="session-object-list">
+      <button type="button" class="session-object-btn" id="sessionObjectBtn1">Parkspot</button>
+      <button type="button" class="session-object-btn" id="sessionObjectBtn2">Univerium</button>
+      <button type="button" class="session-object-btn" id="sessionObjectBtn3">East Park</button>
+      <button type="button" class="session-object-btn" id="sessionObjectBtn4">Bona Dea</button>
+      <button type="button" class="session-object-btn" id="sessionObjectBtn5">Jale Plaza</button>
+      <button type="button" class="session-object-btn" id="sessionObjectBtn6">Konqres</button>
+      <button type="button" class="session-object-btn" id="sessionObjectBtn7">Bakixanov mall</button>
+    </div>
+    <div class="fetch-actions" style="margin-top:12px">
+      <button class="full fetch-primary" id="sessionRunBtn"></button>
+    </div>
+    <div class="fetch-status" id="sessionStatus"></div>
+    <div class="fetch-compact-wrap">
+      <textarea class="ta" id="sessionOut" placeholder=""></textarea>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast">Скопировано!</div>
+
+<script>
+const TS = (k) => (({
+  ru:{
+    start:'Начало',
+    end:'Конец',
+    run:'Загрузить и скопировать',
+    running:'Получаю данные...',
+    ready:'Данные получены и скопированы.',
+    failed:'Не удалось получить данные.',
+    partial:'Не все объекты удалось загрузить.',
+    placeholder:'Готовый текст появится здесь...',
+    copied:'Скопировано!',
+    cors:'Запрос заблокирован.'
+  },
+  az:{
+    start:'Başlanğıc',
+    end:'Son',
+    run:'Yüklə və kopyala',
+    running:'Məlumatlar yüklənir...',
+    ready:'Məlumatlar alındı və kopyalandı.',
+    failed:'Məlumatları almaq olmadı.',
+    partial:'Bütün obyektləri yükləmək olmadı.',
+    placeholder:'Hazır mətn burada görünəcək...',
+    copied:'Kopyalandı!',
+    cors:'Sorğu bloklandı.'
+  }
+})[window.__lang === 'az' ? 'az' : 'ru'][k] || k);
+const $ = (id) => document.getElementById(id);
+const SESSION_RANGE_KEY = 'support2_session_range';
+const SESSION_OBJECTS = [
+  {id:'parkspot', name:'Parkspot', reportRu:'\u041f\u0430\u0440\u043a\u0441\u043f\u043e\u0442', base:'https://parkspot.parqour.com', buttonId:'sessionObjectBtn1', enabled:true},
+  {id:'univerium', name:'Univerium', reportRu:'\u0423\u043d\u0438\u0432\u0435\u0440\u0438\u0443\u043c', base:'https://univerium.parqour.com', buttonId:'sessionObjectBtn2', enabled:true},
+  {id:'east_park', name:'East Park', reportRu:'\u0418\u0441\u0442 \u041f\u0430\u0440\u043a', base:'https://epr.parqour.com', buttonId:'sessionObjectBtn3', enabled:true},
+  {id:'bona_dea', name:'Bona Dea', reportRu:'\u041b\u0438\u0432 \u0411\u043e\u043d\u0430 \u0414\u0435\u0430', base:'https://lbh.parqour.com', buttonId:'sessionObjectBtn4', enabled:true},
+  {id:'jale_plaza', name:'Jale Plaza', reportRu:'\u0414\u0436\u0430\u043b\u044f \u041f\u043b\u0430\u0437\u0430', base:'https://jmr.parqour.com', buttonId:'sessionObjectBtn5', enabled:true},
+  {id:'konqres', name:'Konqres', reportRu:'\u041a\u043e\u043d\u0433\u0440\u0435\u0441', base:'https://bcc.parqour.com', buttonId:'sessionObjectBtn6', enabled:true},
+  {id:'bakixanov_mall', name:'Bakixanov mall', reportRu:'\u0411\u0430\u043a\u0438\u0445\u0430\u043d\u043e\u0432 \u043c\u043e\u043b\u043b', base:'https://bakixanovmall.parqour.com', buttonId:'sessionObjectBtn7', enabled:true}
+];
+const SESSION_AUDIT_COLUMNS = [
+  {data:'created',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'eventType',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'description',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'userName',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'carNumber',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'targetRowId',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'additionalInfo',name:'',searchable:true,orderable:false,search:{value:'',regex:false}}
+];
+const SESSION_CARSTATE_COLUMNS = [
+  {data:'function',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'function',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+  {data:'dimension',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'inTimestampString',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+  {data:'inGate',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'outTimestampString',name:'',searchable:true,orderable:true,search:{value:'',regex:false}},
+  {data:'outGate',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'duration',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'function',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'function',name:'',searchable:true,orderable:false,search:{value:'',regex:false}},
+  {data:'function',name:'',searchable:true,orderable:false,search:{value:'',regex:false}}
+];
+const SESSION_LOOKBACK_DAYS = 365;
+const SESSION_LOOKAHEAD_DAYS = 1;
+const SESSION_FETCH_CONCURRENCY = 6;
+const SESSION_LOOKUP_PAGE_SIZE = 200;
+const SESSION_LOOKUP_MAX_PAGES = 12;
+const AUTO_TICK_MS = 30000;
+let sessionAutoRangePinned = true;
+
+function pad(n){ return String(n).padStart(2,'0'); }
+function dtLocal(date){
+  return `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+function formatRuDate(value){
+  const [d, t] = value.split('T');
+  const [y, m, day] = d.split('-');
+  return `${day}.${m}.${y} ${t}`;
+}
+function showToast(text){
+  const toast = $('toast');
+  toast.textContent = text || TS('copied');
+  toast.classList.remove('show');
+  void toast.offsetWidth;
+  toast.classList.add('show');
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(() => toast.classList.remove('show'), 1500);
+}
+async function copyText(text){
+  if(navigator.clipboard && window.isSecureContext){
+    try{
+      await navigator.clipboard.writeText(text);
+      return;
+    }catch(_){
+    }
+  }
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.setAttribute('readonly', '');
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  ta.style.pointerEvents = 'none';
+  document.body.appendChild(ta);
+  let copied = false;
+  try{
+    ta.focus();
+    ta.select();
+    if(typeof ta.setSelectionRange === 'function'){
+      ta.setSelectionRange(0, ta.value.length);
+    }
+    copied = document.execCommand('copy');
+  }finally{
+    document.body.removeChild(ta);
+  }
+  if(!copied){
+    throw new Error('copy-blocked');
+  }
+}
+function dataReadyText(){
+  return window.__lang === 'az' ? 'Məlumatlar alındı.' : 'Данные получены.';
+}
+function manualCopyHint(){
+  return window.__lang === 'az' ? 'Mətni əl ilə kopyalayın.' : 'Скопируйте текст вручную.';
+}
+function prepareManualCopy(targetId){
+  const field = $(targetId);
+  if(!field) return;
+  try{
+    field.focus();
+    field.select();
+    if(typeof field.setSelectionRange === 'function'){
+      field.setSelectionRange(0, field.value.length);
+    }
+  }catch(_){
+  }
+}
+async function tryCopyText(text, targetId){
+  try{
+    await copyText(text);
+    return true;
+  }catch(error){
+    console.warn('Copy failed', error);
+    prepareManualCopy(targetId);
+    return false;
+  }
+}
+function sessionStatusAfterCopy(stats, copied){
+  if(copied) return sessionReadyText(stats);
+  const base = stats.unresolved ? `${TS('partial')} (${stats.unresolved})` : dataReadyText();
+  return `${base} ${manualCopyHint()}`;
+}
+function makeSessionAuditPayload(){
+  return {
+    draw:1,
+    columns:SESSION_AUDIT_COLUMNS,
+    order:[{column:0,dir:'desc'}],
+    start:0,
+    length:200,
+    search:{value:'',regex:false}
+  };
+}
+function makeSessionCarStateLookupPayload(dateFromString, dateToString, plateNumber){
+  return {
+    draw:1,
+    columns:SESSION_CARSTATE_COLUMNS,
+    order:[{column:3,dir:'desc'}],
+    start:0,
+    length:SESSION_LOOKUP_PAGE_SIZE,
+    search:{value:'',regex:false},
+    customFilters:{
+      dateFromString,
+      dateToString,
+      plateNumber: plateNumber || '',
+      amount:'',
+      inGateId:'',
+      outGateId:'',
+      inParking:false,
+      carOutType:'',
+      carEntryType:''
+    }
+  };
+}
+async function postJson(base, url, payload, refererPath){
+  const headers = {
+    'accept':'application/json, text/javascript, */*; q=0.01',
+    'content-type':'application/json',
+    'x-requested-with':'XMLHttpRequest'
+  };
+  const extra = {};
+  try{
+    extra.referrer = base + refererPath;
+  }catch(_){}
+  let res;
+  try{
+    res = await fetch(url, {
+      method:'POST',
+      credentials:'include',
+      mode:'cors',
+      headers,
+      body: JSON.stringify(payload),
+      ...extra
+    });
+  }catch(err){
+    const e = new Error(TS('cors'));
+    e.cause = err;
+    throw e;
+  }
+  if(!res.ok){
+    throw new Error(`HTTP ${res.status}`);
+  }
+  return res.json();
+}
+function parseAuditCreated(value){
+  const [datePart, timePart = '00:00:00'] = String(value || '').trim().split(' ');
+  const [year, month, day] = datePart.split('-').map(Number);
+  const [hours, minutes, seconds] = timePart.split(':').map(Number);
+  return new Date(year, (month || 1) - 1, day || 1, hours || 0, minutes || 0, seconds || 0, 0);
+}
+function classifySession(session){
+  if(!session) return 'unknown';
+  const amount = session.rateAmount == null ? 0 : Number(session.rateAmount);
+  if(Number.isNaN(amount)) return 'unknown';
+  return amount > 0 ? 'paid' : 'free';
+}
+async function mapWithConcurrency(items, limit, worker){
+  const results = new Array(items.length);
+  let index = 0;
+  const runners = Array.from({length: Math.max(1, Math.min(limit, items.length || 1))}, async () => {
+    while(index < items.length){
+      const current = index++;
+      results[current] = await worker(items[current], current);
+    }
+  });
+  await Promise.all(runners);
+  return results;
+}
+function setSessionCardStatus(text){
+  $('sessionStatus').textContent = text || '';
+}
+function sessionReadyText(stats){
+  if(stats.unresolved){
+    return `${TS('partial')} (${stats.unresolved})`;
+  }
+  return TS('ready');
+}
+function sessionFailedText(message){
+  return `${TS('failed')} ${message}`;
+}
+function buildSessionText(start, end, results){
+  const lines = [
+    formatRuDate(start),
+    formatRuDate(end)
+  ];
+  if(results.length) lines.push('');
+  results.forEach((result) => {
+    lines.push(`*${result.object.reportRu}*`);
+    lines.push(`Бесплатные сессии:${result.stats.free}`);
+    lines.push(`Платные сессии:${result.stats.paid}`);
+  });
+  return lines.join('\n');
+}
+function buildSessionTextCompact(start, end, results){
+  const visibleResults = results.filter((result) => (result.stats.free || 0) > 0 || (result.stats.paid || 0) > 0);
+  const lines = [
+    formatRuDate(start),
+    formatRuDate(end)
+  ];
+  if(visibleResults.length) lines.push('');
+  visibleResults.forEach((result) => {
+    const parts = [];
+    if((result.stats.free || 0) > 0){
+      parts.push(`\u0411\u0435\u0441\u043f\u043b\u0430\u0442\u043d\u044b\u0435 ${result.stats.free}`);
+    }
+    if((result.stats.paid || 0) > 0){
+      parts.push(`\u041f\u043b\u0430\u0442\u043d\u044b\u0435 ${result.stats.paid}`);
+    }
+    lines.push(`*${result.object.reportRu}*`);
+    lines.push(parts.join(' | '));
+  });
+  return lines.join('\n');
+}
+async function fetchSessionAuditCloseRows(object, start, end){
+  const url = `${object.base}/rest/audit/list?dateFrom=${encodeURIComponent(start)}&dateTo=${encodeURIComponent(end)}&eventType=CAR_STATE_CLOSE&userName=&plateNumber=`;
+  return postJson(object.base, url, makeSessionAuditPayload(), '/audit/list?lang=ru');
+}
+async function fetchMatchedSession(object, row){
+  const createdAt = parseAuditCreated(row.created);
+  const dateTo = dtLocal(new Date(createdAt.getTime() + SESSION_LOOKAHEAD_DAYS * 24 * 60 * 60 * 1000));
+  const dateFrom = dtLocal(new Date(createdAt.getTime() - SESSION_LOOKBACK_DAYS * 24 * 60 * 60 * 1000));
+  for(let page = 0; page < SESSION_LOOKUP_MAX_PAGES; page++){
+    const payload = makeSessionCarStateLookupPayload(dateFrom, dateTo, row.carNumber);
+    payload.start = page * SESSION_LOOKUP_PAGE_SIZE;
+    const response = await postJson(
+      object.base,
+      `${object.base}/rest/carstate`,
+      payload,
+      '/journal/list?lang=ru'
+    );
+    const list = Array.isArray(response && response.data) ? response.data : [];
+    const matched = list.find(item => Number(item.id) === Number(row.targetRowId)) || null;
+    if(matched) return matched;
+    if(list.length < SESSION_LOOKUP_PAGE_SIZE) break;
+  }
+  return null;
+}
+async function computeAutoSessionStats(object, start, end){
+  const audit = await fetchSessionAuditCloseRows(object, start, end);
+  const rows = Array.isArray(audit && audit.data) ? audit.data : [];
+  if(!rows.length) return { free:0, paid:0, unresolved:0, total:0 };
+  const sessions = await mapWithConcurrency(rows, SESSION_FETCH_CONCURRENCY, async (row) => {
+    try{
+      return await fetchMatchedSession(object, row);
+    }catch(_){
+      return null;
+    }
+  });
+  const stats = { free:0, paid:0, unresolved:0, total:rows.length };
+  for(const session of sessions){
+    const type = classifySession(session);
+    if(type === 'free') stats.free += 1;
+    else if(type === 'paid') stats.paid += 1;
+    else stats.unresolved += 1;
+  }
+  return stats;
+}
+function sessionEscapeHtml(text){
+  return String(text)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+function sessionTitleHtml(text){
+  return `<span class="session-object-title">${sessionEscapeHtml(text)}</span>`;
+}
+function sessionLightHtml(state = 'idle'){
+  return `<span class="session-object-light${state && state !== 'idle' ? ` is-${state}` : ''}" aria-hidden="true"></span>`;
+}
+function sessionHeadHtml(object, lightState = 'idle', sideHtml = ''){
+  return `<span class="session-object-head">${sessionTitleHtml(object.name)}<span class="session-object-side">${sideHtml}${sessionLightHtml(lightState)}</span></span>`;
+}
+function sessionIconMarkup(kind){
+  const src = kind === 'free' ? 'free.PNG' : 'paid.PNG';
+  return `<span class="session-object-icon-mask" style="--session-icon:url('${src}')" aria-hidden="true"></span>`;
+}
+function sessionStatHtml(iconClass, count){
+  const kind = iconClass === 'session-object-icon-free' ? 'free' : 'paid';
+  return `<span class="session-object-stat"><span class="session-object-icon ${iconClass}">${sessionIconMarkup(kind)}</span><span class="session-object-count">${count}</span></span>`;
+}
+function sessionStatsHtml(stats){
+  return `<span class="session-object-stats">${sessionStatHtml('session-object-icon-free', stats.free)}${sessionStatHtml('session-object-icon-money', stats.paid)}</span>`;
+}
+function sessionButtonBaseHtml(object){
+  return sessionHeadHtml(object, 'idle');
+}
+function sessionButtonLoadingHtml(object){
+  return sessionHeadHtml(object, 'loading');
+}
+function sessionButtonDoneHtml(object, stats){
+  return sessionHeadHtml(object, 'ready', sessionStatsHtml(stats));
+}
+function sessionButtonErrorHtml(object){
+  return sessionHeadHtml(object, 'error');
+}
+function setSessionObjectButtonText(object, text, state = ''){
+  const button = $(object.buttonId);
+  if(!button) return;
+  button.innerHTML = text;
+  button.classList.toggle('is-loading', state === 'loading');
+  button.classList.toggle('is-error', state === 'error');
+}
+function resetSessionObjectButtons(){
+  SESSION_OBJECTS.forEach(object => setSessionObjectButtonText(object, sessionButtonBaseHtml(object)));
+}
+function aggregateSessionStats(results){
+  return results.reduce((acc, item) => {
+    acc.free += item.stats.free;
+    acc.paid += item.stats.paid;
+    acc.unresolved += item.stats.unresolved || 0;
+    acc.total += item.stats.total || 0;
+    return acc;
+  }, {free:0, paid:0, unresolved:0, total:0});
+}
+function renderSessionSummary(start, end, results){
+  $('sessionOut').value = buildSessionTextCompact(start, end, results);
+}
+async function runSessionCounterSafe(start, end){
+  setSessionCardStatus(TS('running'));
+  $('sessionRunBtn').disabled = true;
+  resetSessionObjectButtons();
+  $('sessionOut').value = '';
+  const completed = [];
+  try{
+    for(const object of SESSION_OBJECTS){
+      if(!object.enabled) continue;
+      setSessionObjectButtonText(object, sessionButtonLoadingHtml(object), 'loading');
+      const stats = await computeAutoSessionStats(object, start, end);
+      completed.push({object, stats});
+      setSessionObjectButtonText(object, sessionButtonDoneHtml(object, stats));
+      renderSessionSummary(start, end, completed);
+    }
+    const totals = aggregateSessionStats(completed);
+    const copied = await tryCopyText($('sessionOut').value, 'sessionOut');
+    setSessionCardStatus(sessionStatusAfterCopy(totals, copied));
+    if(copied) showToast(TS('copied'));
+  }catch(error){
+    console.error(error);
+    const activeObject = SESSION_OBJECTS.find(object => object.enabled && $(object.buttonId) && $(object.buttonId).classList.contains('is-loading'));
+    if(activeObject) setSessionObjectButtonText(activeObject, sessionButtonErrorHtml(activeObject), 'error');
+    setSessionCardStatus(sessionFailedText(error && error.message ? error.message : TS('failed')));
+  }finally{
+    $('sessionRunBtn').disabled = false;
+  }
+}
+function getSessionAutoRange(now = new Date()){
+  return {
+    start: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 13, 0, 0, 0),
+    end: new Date(now.getFullYear(), now.getMonth(), now.getDate(), 21, 0, 0, 0)
+  };
+}
+function isCurrentSessionRangeAutoSelected(){
+  const range = getSessionAutoRange();
+  return $('sessionStartDT').value === dtLocal(range.start) && $('sessionEndDT').value === dtLocal(range.end);
+}
+function saveSessionRange(){
+  localStorage.setItem(SESSION_RANGE_KEY, JSON.stringify({start:$('sessionStartDT').value, end:$('sessionEndDT').value}));
+}
+function applySessionAutoShift(force = false){
+  if(!force && !sessionAutoRangePinned) return false;
+  const range = getSessionAutoRange();
+  const nextStart = dtLocal(range.start);
+  const nextEnd = dtLocal(range.end);
+  const changed = $('sessionStartDT').value !== nextStart || $('sessionEndDT').value !== nextEnd;
+  if(force || changed){
+    $('sessionStartDT').value = nextStart;
+    $('sessionEndDT').value = nextEnd;
+    saveSessionRange();
+    sessionAutoRangePinned = true;
+    return true;
+  }
+  return false;
+}
+function applyLang(){
+  $('sessionStartLabel').textContent = TS('start');
+  $('sessionEndLabel').textContent = TS('end');
+  $('sessionRunBtn').textContent = TS('run');
+  $('sessionOut').placeholder = TS('placeholder');
+  $('toast').textContent = TS('copied');
+}
+function initSessionCard(){
+  applyLang();
+  applySessionAutoShift(true);
+  resetSessionObjectButtons();
+  $('sessionOut').value = '';
+  setSessionCardStatus('');
+  $('sessionRunBtn').addEventListener('click', async () => {
+    const start = $('sessionStartDT').value;
+    const end = $('sessionEndDT').value;
+    if(!start || !end){
+      setSessionCardStatus('');
+      return;
+    }
+    saveSessionRange();
+    await runSessionCounterSafe(start, end);
+  });
+  $('sessionStartDT').addEventListener('change', () => {
+    sessionAutoRangePinned = isCurrentSessionRangeAutoSelected();
+    saveSessionRange();
+  });
+  $('sessionEndDT').addEventListener('change', () => {
+    sessionAutoRangePinned = isCurrentSessionRangeAutoSelected();
+    saveSessionRange();
+  });
+}
+
+initSessionCard();
+const refreshSupport2State = () => {
+  if(document.visibilityState === 'hidden') return;
+  if(!$('sessionRunBtn').disabled && applySessionAutoShift(false)){
+    $('sessionOut').value = '';
+    resetSessionObjectButtons();
+    setSessionCardStatus('');
+  }
+};
+window.addEventListener('focus', refreshSupport2State);
+document.addEventListener('visibilitychange', () => { if(document.visibilityState === 'visible') refreshSupport2State(); });
+window.addEventListener('pageshow', refreshSupport2State);
+setInterval(refreshSupport2State, AUTO_TICK_MS);
+</script>
+<script src="pwa-update.js?v=20260414pro7"></script>
+</body>
+</html>
